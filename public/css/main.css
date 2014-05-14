@@ -1,0 +1,36 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding: 10px;
+}
+
+* {
+    font-family: "Arial";
+}
+
+hr {
+    margin: 10px 0;
+}
+
+div.bottom {
+    text-align: center;
+}
+
+div.navig {
+    float: left;
+    margin-right: 10px;
+}
+
+pre {
+    font-size: 10px;
+    font-family: "Mono";
+}
+
+pre.ac-config {
+    float: left;
+    border-left: 1px black solid;
+    padding-left: 10px;
+}

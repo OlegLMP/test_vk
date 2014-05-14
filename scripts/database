@@ -1,0 +1,25 @@
+#!/usr/bin/php
+<?php
+ini_set('display_errors', 1);
+require_once realpath(__DIR__ . '/../app/app.inc.php');
+
+if (! isset($argv[1]) || ! isset($argv[2])) {
+    exit("Usage: database.php configSection script1 [script2] ...\n");
+}
+
+$db = Db::get($argv[1]);
+
+for ($i = 2; isset($argv[$i]); $i ++) {
+    $sqlFile = $argv[$i] . '.sql';
+    F::log($sqlFile);
+    if ('/' != substr($sqlFile, 0, 1)) {
+        $sqlFile = APPLICATION_ROOT . '/app/config/schema/' . $argv[1] . '/' . $sqlFile;
+    }
+    $db->execFile($sqlFile);
+    if ($argv[$i] == 'create') {
+        $db->fillFieldNames();
+    }
+    if (file_exists($fileName = APPLICATION_ROOT . '/app/config/schema/' . $argv[1] . '/' . $argv[$i] . '.php')) {
+        include $fileName;
+    }
+}
