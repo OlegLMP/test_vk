@@ -15,3 +15,10 @@ port     = 3306
 username = "vk"
 password = "*****"
 dbname   = "test_vk2"
+
+[database3]
+host     = "127.0.0.1"
+port     = 3306
+username = "vk"
+password = "*****"
+dbname   = "test_vk3"
