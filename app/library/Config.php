@@ -27,8 +27,25 @@ class Config {
         $data = parse_ini_file($filename, true);
         if (isset($prefix)) {
             self::$_config[$prefix] = $data;
-        } else {
-            self::$_config = $data;
+        }
+        self::expand($prefix, $data);
+    }
+
+    /**
+     * Разворачивает настройки для быстрого доступа по ключам
+     *
+     * @author olegb
+     * @param string $filename - путь к конфиг-файлу
+     * @return void
+     */
+    public static function expand($prefix, $data)
+    {
+        foreach ($data as $subPrefix => $subData) {
+            $newPrefix = (strlen($prefix) ? $prefix . '.' : '') . $subPrefix;
+            self::$_config[$newPrefix] = $subData;
+            if (is_array($subData)) {
+                self::expand($newPrefix, $subData);
+            }
         }
     }
 
@@ -47,13 +64,6 @@ class Config {
         }
         if (isset(self::$_config[$path])) {
             return self::$_config[$path];
-        }
-        while (($p = strpos($path, '.')) !== false) {
-            $prefix = substr($path, 0, $p);
-            $path = substr($path, $p + 1);
-            if (isset(self::$_config[$path])) {
-                return self::$_config[$path];
-            }
         }
         return false;
     }

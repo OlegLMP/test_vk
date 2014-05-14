@@ -103,8 +103,8 @@ class Db {
         if ($debug = Config::get('settings.debug')) {
             $startTime = microtime(true);
         }
+        $query = trim($query);
         try {
-            $query = trim($query);
             $this->_statement = $pdo->query($query);
             if ($debug) {
                 Debuger::message($query . ' - ' . number_format(microtime(true) - $startTime, 4));
@@ -120,6 +120,9 @@ class Db {
                 return $this->getAffectedRows();
             }
         } catch(PDOException $e) {
+            if ($debug) {
+                Debuger::message($query . ' - ' . number_format(microtime(true) - $startTime, 4) . ' - ' . $e->getMessage());
+            }
             $this->_mysqlException($e->getMessage());
         }
     }

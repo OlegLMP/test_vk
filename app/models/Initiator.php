@@ -44,10 +44,13 @@ class Initiator extends ActiveRecord
         } elseif (! empty($_SERVER['PHP_SELF'])) {
             $createData['url'] = $_SERVER['PHP_SELF'];
         }
+        if ($key = Initiator::findOneByParams($createData, true)) {
+            return $key;
+        }
         try {
             $key = Initiator::create($createData, true);
         } catch (Exception $e) {
-        	// Видимо уже есть в базе, читаем его
+        	// Видимо создался другим потоком, пробуем прочитать его
             $key = Initiator::findOneByParams($createData, true);
         }
         if (! $key) {

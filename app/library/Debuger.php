@@ -20,7 +20,7 @@ class Debuger
      */
     public static function message($text)
     {
-        $count = count($this->messages);
+        $count = count(self::$messages);
         if ($count > 1000) {
             return;
         }
@@ -28,18 +28,7 @@ class Debuger
         if ($count == 1000) {
             $text = 'Debuger disabled because of messages count > 1000';
         }
-        self::$messages = date('Y-m-d H:i:s', $time) . (str_pad(strstr($time, '.'), 5, '0')) . '| ' . $text;
-    }
-
-    /**
-     * Конвертация объекта в строку
-     *
-     * @author olegb
-     * @return string
-     */
-    public static function __toString()
-    {
-        return $this->output();
+        self::$messages[] = date('Y-m-d H:i:s', $time) . (str_pad(strstr($time, '.'), 5, '0')) . '| ' . $text;
     }
 
     /**
@@ -53,13 +42,13 @@ class Debuger
         if (! Config::get('settings.debug')) {
             return '';
         }
-        if (! $this->messages) {
+        if (! self::$messages) {
             return '';
         }
-        $this->message('Finished in ' . F::getScriptTime());
+        self::message('Finished in ' . F::getScriptTime());
         $code = '<a class="debug-link" href="javascript:;" onclick="e=document.getElementsByClassName(\'debug\')[0];e.style.display=(e.style.display==\'block\'?\'none\':\'block\');">Отладка</a>
 <div class="debug" style="display:none;">';
-        foreach ($this->messages as $message) {
+        foreach (self::$messages as $message) {
             $code .= $message . "<br/>\n";
         }
         $code .= '</div>';

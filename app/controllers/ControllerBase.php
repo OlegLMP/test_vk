@@ -37,7 +37,7 @@ abstract class ControllerBase
     {
         $controller = substr(get_called_class(), 0, -10);
         $controller = lcfirst($controller);
-        $this->urls = (object) array(
+        $this->urls = array(
             'controller' => '/' . $controller,
             'action'     => '/' . $controller . '/' . substr($actionMethod, 0, -6)
         );
@@ -57,16 +57,19 @@ abstract class ControllerBase
     }
 
     /**
-     * Вывод предствления (вьюшки)
+     * Вывод представления (вьюшки)
      *
      * @author oleg
-     * @param string $name - путь/название
+     * @param string $path - путь/название. Если не задан, берётся controller/action
      * @param array $params - параметры для отображения
      * @return void
      */
-    public function renderView($name, $params = array())
+    public function renderView($path = null, $params = array())
     {
+        if (! isset($path)) {
+            $path = $this->urls['action'];
+        }
         $urls = $this->urls;
-        include $this->viewsDir . '/' . $name . '.phtml';
+        include $this->viewsDir . (strpos($path, '/') === 0 ? '' : '/') . $path . '.phtml';
     }
 }

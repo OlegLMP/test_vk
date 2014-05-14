@@ -21,4 +21,8 @@ spl_autoload_register(function ($class) {
 
 Config::read(APPLICATION_ROOT . '/app/config/config.ini');
 
+if (Config::get('settings.debug')) {
+    Debuger::message('Started');
+}
+
 session_cache_expire(1440);
