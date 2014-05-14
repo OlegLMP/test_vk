@@ -16,6 +16,20 @@ abstract class ControllerBase
     public $urls;
 
     /**
+     * Массив со ссылками на JS скрипты, которые нужно подключить при выводе страницы
+     *
+     * @var array
+     */
+    public $jsScripts = array();
+
+    /**
+     * Флаг вывода Ajax. Если установлен в true, то шапка и подвал не выводятся
+     *
+     * @var array
+     */
+    public $isAjax = false;
+
+    /**
      * Конструктор
      *
      * @author oleg
@@ -24,6 +38,8 @@ abstract class ControllerBase
     public function __construct()
     {
         $this->viewsDir = realpath(__DIR__ . '/../views');
+        $this->jsScripts[] = '/js/jquery-1.11.1.min.js';
+        $this->jsScripts[] = '/js/layout.js';
     }
 
     /**
@@ -42,7 +58,6 @@ abstract class ControllerBase
             'action'     => '/' . $controller . '/' . substr($actionMethod, 0, -6)
         );
         ob_start();
-        $this->renderView('_layout/top');
     }
 
     /**
@@ -53,7 +68,12 @@ abstract class ControllerBase
      */
     public function after()
     {
-        $this->renderView('_layout/bottom');
+        if (! $this->isAjax) {
+            $content = ob_get_clean();
+            $this->renderView('_layout/top', array('jsScripts' => $this->jsScripts));
+            echo $content;
+            $this->renderView('_layout/bottom');
+        }
     }
 
     /**

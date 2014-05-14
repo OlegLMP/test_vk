@@ -3,11 +3,29 @@
 <head>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     <title>УСВАЗ - Упрощенная система выполнения абстрактных заказов</title>
-    <link rel="stylesheet" href="/css/main.css" type="text/css" />
+    <link rel="stylesheet" href="/css/main.css?1" type="text/css" />
+    <?php foreach ($params['jsScripts'] as $script): ?>
+    <script type="text/javascript" src="<?php echo $script; ?>"></script>
+    <?php endforeach; ?>
 </head>
 <body>
+<div class="page">
 <div class="top">
+<a href="/">
+    <div class="logo">УСВАЗ</div>
+</a>
+<div class="auth-links">
+    <a href="#dialog" name="modal" url="/auth/register">Регистрация</a>
+</div>
+<div class="clear"></div>
+</div>
 
+<div id="boxes">
+	<div id="dialog" class="window">
+	    <div class="dialogContainer"></div>
+		<div class="close-link close"></div>
+	</div>
+ 	<div id="mask"></div>
 </div>
 
 <hr/>
