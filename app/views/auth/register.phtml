@@ -9,19 +9,28 @@
 <form id="reg-form" action="/auth/register2">
 <div class="input-label">Ваше имя</div>
 <div class="input-field">
-    <label for="firstname">Введите имя</label>
-    <input type="text" name="firstname" id="firstname" value="" class="fieldCheck">
+    <label for="first_name">Введите имя</label>
+    <input type="text" name="first_name" id="first_name" value="" class="fieldCheck"
+        params="<?php echo htmlspecialchars(json_encode(array(
+            array('local', 'regExp', AuthController::RESTRICT_NAME_REGEXP),
+            array('local', 'stringLength', 1, AuthController::RESTRICT_NAME_MAX_LENGTH),
+        ))); ?>">
 </div>
 <div class="clear"></div>
 <div class="input-label">Ваша фамилия</div>
 <div class="input-field">
-    <label for="lastname">Введите фамилию</label>
-    <input type="text" name="lastname" id="lastname" value="" class="fieldCheck">
+    <label for="last_name">Введите фамилию</label>
+    <input type="text" name="last_name" id="last_name" value="" class="fieldCheck"
+        params="<?php echo htmlspecialchars(json_encode(array(
+            array('local', 'regExp', AuthController::RESTRICT_NAME_REGEXP),
+            array('local', 'stringLength', 1, AuthController::RESTRICT_NAME_MAX_LENGTH),
+        ))); ?>">
 </div>
 <div class="clear"></div>
 <div class="input-button">
 <button>
-    <span>Зарегистрироваться</span>
+    <span class="button-text">Зарегистрироваться</span>
+    <span class="button-wait"><img src="/img/css/upload_inv_mono.gif"></span>
 </button>
 </div>
 </form>
@@ -31,9 +40,13 @@ FieldCheck.initAll();
 $("#reg-form").submit(function( event ) {
     event.preventDefault();
     var form = $( this );
+    form.find('.button-text').hide();
+    form.find('.button-wait').show();
     $.post(form.attr( "action" ), form.serialize(),
         function(data) {
             if (data.status == 'error') {
+                form.find('.button-wait').hide();
+                form.find('.button-text').show();
                 $(".dialogMessage").html(data.message);
                 $(".dialogMessageBorder").css("width", $(".dialogMessage").css("width")).css("height", $(".dialogMessage").css("height"));
                 $(".dialogMessageBorder").fadeTo(0, 1).fadeTo(600, 0);
@@ -43,6 +56,9 @@ $("#reg-form").submit(function( event ) {
             	form.attr("action", data.action);
             	form.html(data.content);
             	FieldCheck.initAll();
+            }
+            if (data.status == 'redirect') {
+                document.location = data.url;
             }
         }, "json");
 });

@@ -148,6 +148,7 @@ function FieldCheck(params)
         
         // Проводим локальные проверки без обращения к серверу
         var cacheVal = val;
+        var needServerRequest = false;
         if (typeof this.params == 'string' && this.params.length)	{
         	var params = JSONToObject(this.params);
         	if (typeof params == 'object') {
@@ -163,7 +164,28 @@ function FieldCheck(params)
         							return;
         						}
         						break;
+           					case 'stringLength':
+        						if (typeof params[k][2] == 'number' && val.length < params[k][2]) {
+        							this.onResult({result : false, message : 'Минимальная длина - ' + params[k][2]});
+        							this.lastVal = ''; //Сбрасываем кэш
+        							return;
+        						}
+        						if (typeof params[k][3] == 'number' && val.length > params[k][3]) {
+        							this.onResult({result : false, message : 'Максимальная длина - ' + params[k][3]});
+        							this.lastVal = ''; //Сбрасываем кэш
+        							return;
+        						}
+        						break;
+           					case 'regExp':
+        						if (val.search(new RegExp(params[k][2])) == -1) {
+        							this.onResult({result : false, message : 'Содержатся недопустимые символы'});
+        							this.lastVal = ''; //Сбрасываем кэш
+        							return;
+        						}
+        						break;
         				}
+        			} else {
+        				needServerRequest = true;
         			}
         		}
         	}
@@ -176,7 +198,7 @@ function FieldCheck(params)
         this.lastVal = cacheVal;
         
         // Если параметры проверки не заданы, то выводим Ok
-        if (typeof this.params != 'string' || ! this.params.length)	{
+        if (! needServerRequest)	{
         	this.setStyle(true);
         	return
         }

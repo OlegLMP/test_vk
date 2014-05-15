@@ -1,0 +1,17 @@
+<div class="input-label">Ваш пароль</div>
+<div class="input-field">
+    <label for="password">Введите пароль</label>
+    <input type="password" name="password" id="password" value="" autocomplete="off" class="fieldCheck"
+        params='<?php echo json_encode(array(array('local', 'stringLength', AuthController::RESTRICT_PASSWORD_MIN_LENGTH, AuthController::RESTRICT_PASSWORD_MAX_LENGTH), array('local', 'inputEquals', 'passwordConfirm'))); ?>'>
+</div>
+<div class="clear"></div>
+<div class="input-field">
+    <label for="passwordConfirm">Повторите пароль</label>
+    <input type="password" name="passwordConfirm" id="passwordConfirm" value="" autocomplete="off" class="fieldCheck">
+</div>
+<div class="clear"></div>
+<div class="input-button">
+<button>
+    <span>Завершить регистрацию</span>
+</button>
+</div>

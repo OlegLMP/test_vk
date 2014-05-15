@@ -6,17 +6,17 @@
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
- `is_customer` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT "Может выступать в роли заказчика"
- `is_executor` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT "Может выступать в роли исполнителя"
+ `is_customer` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT "Может выступать в роли заказчика",
+ `is_executor` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT "Может выступать в роли исполнителя",
  `last_role` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT "->user_role.id В какой роли выступал",
  `email` varchar(50) NOT NULL COMMENT "E-Mail",
- `first_name` varchar(255) NOT NULL COMMENT "Имя",
- `last_name` varchar(255) NOT NULL COMMENT "Фамилия",
+ `first_name` VARCHAR(255) NOT NULL COMMENT "Имя",
+ `last_name` VARCHAR(255) NOT NULL COMMENT "Фамилия",
+ `password_hash` VARCHAR(255) COMMENT "Хэш пароля, он же соль",
  `created` TIMESTAMP NOT NULL DEFAULT "0000-00-00 00:00:00" COMMENT "Создан",
  `updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Изменён",
  PRIMARY KEY (`id`),
- UNIQUE KEY email_idx (`email`),
- KEY `role_idx` (`role`)
+ UNIQUE KEY email_idx (`email`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `user_role`;

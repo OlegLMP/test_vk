@@ -78,7 +78,7 @@ class CheckController extends ControllerBase
      * @param &string $errorMessage - для возврата сообщения об ошибке
      * @return bool - true при удачной проверке, иначе false
      */
-    public static function validateEmailAddress($val, & $errorMessage)
+    public static function validateEmailAddress($val, & $errorMessage = null)
     {
         if ($val !== filter_var($val, FILTER_VALIDATE_EMAIL)) {
             $errorMessage = 'Укажите верный Email';
@@ -95,7 +95,7 @@ class CheckController extends ControllerBase
      * @param &string $errorMessage - для возврата сообщения об ошибке
      * @return bool - true при удачной проверке, иначе false
      */
-    public static function validateEmailNotExists($val, & $errorMessage)
+    public static function validateEmailNotExists($val, & $errorMessage = null)
     {
         if (User::findOneBy('email', $val)) {
             $errorMessage = 'Этот Email уже занят';

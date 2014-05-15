@@ -177,3 +177,6 @@ div.logo {
     padding: 8px 11px;
     position: relative;
 }
+.button-wait {
+	display: none;
+}
