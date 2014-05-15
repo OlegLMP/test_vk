@@ -71,7 +71,6 @@ abstract class ControllerBase
     {
         if (! $this->isAjax) {
             $content = ob_get_clean();
-            ob_end_clean();
             $this->renderView('_layout/top', array('jsScripts' => $this->jsScripts));
             echo $content;
             $this->renderView('_layout/bottom');
@@ -93,5 +92,55 @@ abstract class ControllerBase
         }
         $urls = $this->urls;
         include $this->viewsDir . (strpos($path, '/') === 0 ? '' : '/') . $path . '.phtml';
+    }
+
+    /**
+     * Генерация хэша для CSRF защиты формы
+     *
+     * @author oleg
+     * @param string $formName - имя формы. Необходимо задать, если нужны несколько разных токенов на странице
+     * @return string - сгенерированный хэш
+     */
+    public static function generateFormHash($formName = '')
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        return $_SESSION['form_csrf_hash' . $formName] = base64_encode(mcrypt_create_iv(8, MCRYPT_DEV_URANDOM));
+    }
+
+    /**
+     * Проверка хэша CSRF защиты формы
+     *
+     * @author oleg
+     * @param $hash - переданный хэш
+     * @param string $formName - имя формы, с которым генерился токен
+     * @return bool - true при удачное проверке, иначе false
+     */
+    public static function checkFormHash($hash, $formName = '')
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        $key = 'form_csrf_hash' . $formName;
+        return ! empty($_SESSION[$key]) && ! strcmp($_SESSION[$key], $hash);
+    }
+
+    /**
+     * Внутренний редирект
+     *
+     * @author oleg
+     * @param $url - относительный URL (без домена)
+     * @return void
+     */
+    public static function redirect($url)
+    {
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        $scheme = $_SERVER['SERVER_PORT'] == 80 ? 'http' : 'https';
+        $link = $scheme . '://' . $_SERVER['HTTP_HOST'] . (strpos($url, '/') === 0 ? '' : '/') . $url;
+        header('Location: ' . $link);
+        exit();
     }
 }

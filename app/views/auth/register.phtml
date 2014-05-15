@@ -14,7 +14,7 @@
         params="<?php echo htmlspecialchars(json_encode(array(
             array('local', 'regExp', AuthController::RESTRICT_NAME_REGEXP),
             array('local', 'stringLength', 1, AuthController::RESTRICT_NAME_MAX_LENGTH),
-        ))); ?>">
+        ))); ?>" />
 </div>
 <div class="clear"></div>
 <div class="input-label">Ваша фамилия</div>
@@ -24,9 +24,10 @@
         params="<?php echo htmlspecialchars(json_encode(array(
             array('local', 'regExp', AuthController::RESTRICT_NAME_REGEXP),
             array('local', 'stringLength', 1, AuthController::RESTRICT_NAME_MAX_LENGTH),
-        ))); ?>">
+        ))); ?>" />
 </div>
 <div class="clear"></div>
+<input type="hidden" name="hash" value="<?php echo ControllerBase::generateFormHash(); ?>" />
 <div class="input-button">
 <button>
     <span class="button-text">Зарегистрироваться</span>
@@ -47,6 +48,9 @@ $("#reg-form").submit(function( event ) {
             if (data.status == 'error') {
                 form.find('.button-wait').hide();
                 form.find('.button-text').show();
+                if (typeof data.hash != 'undefined') {
+                    form.find('input[name="hash"]').val(data.hash);
+                }
                 $(".dialogMessage").html(data.message);
                 $(".dialogMessageBorder").css("width", $(".dialogMessage").css("width")).css("height", $(".dialogMessage").css("height"));
                 $(".dialogMessageBorder").fadeTo(0, 1).fadeTo(600, 0);

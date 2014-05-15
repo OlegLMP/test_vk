@@ -1,0 +1,56 @@
+<div class="dialogTitle">Добро пожаловать!</div>
+<div class="dialogMessageBox">
+    <div class="dialogMessageBorder"></div>
+    <div class="dialogMessage">
+        <b>Пожалуйста, введите ваш логин и пароль.</b><br/>
+        Или нажмите на ссылку, чтобы <a href="#dialog" name="modal" url="/auth/register">Зарегистрироваться</a>.
+    </div>
+</div>
+<form id="reg-form" action="/auth/login2">
+<div class="input-label">Ваш Email</div>
+<div class="input-field">
+    <label for="email">Введите Email</label>
+    <input type="text" name="email" id="email" value="" class="fieldCheck"
+        params='<?php echo json_encode(array(array('form', 'EmailAddress'))); ?>' />
+</div>
+<div class="clear"></div>
+<div class="input-label">Ваш пароль</div>
+<div class="input-field">
+    <label for="password">Введите пароль</label>
+    <input type="password" name="password" id="password" value="" />
+</div>
+<div class="clear"></div>
+<input type="hidden" name="hash" value="<?php echo ControllerBase::generateFormHash(); ?>" />
+<div class="input-button">
+<button>
+    <span class="button-text">Войти</span>
+    <span class="button-wait"><img src="/img/css/upload_inv_mono.gif"></span>
+</button>
+</div>
+</form>
+
+<script>
+FieldCheck.initAll();
+$("#reg-form").submit(function( event ) {
+    event.preventDefault();
+    var form = $( this );
+    form.find('.button-text').hide();
+    form.find('.button-wait').show();
+    $.post(form.attr( "action" ), form.serialize(),
+        function(data) {
+            if (data.status == 'error') {
+                form.find('.button-wait').hide();
+                form.find('.button-text').show();
+                if (typeof data.hash != 'undefined') {
+                    form.find('input[name="hash"]').val(data.hash);
+                }
+                $(".dialogMessage").html(data.message);
+                $(".dialogMessageBorder").css("width", $(".dialogMessage").css("width")).css("height", $(".dialogMessage").css("height"));
+                $(".dialogMessageBorder").fadeTo(0, 1).fadeTo(600, 0);
+            }
+            if (data.status == 'redirect') {
+                document.location = data.url;
+            }
+        }, "json");
+});
+</script>

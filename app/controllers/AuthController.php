@@ -13,6 +13,19 @@ class AuthController extends ControllerBase
      */
     public $isAjax = true;
 
+    /**
+     * Работа до вызова Action метода
+     *
+     * @author oleg
+     * @param string $actionMethod - имя Action метода, который планируется вызвать
+     * @return void
+     */
+    public function before($actionMethod)
+    {
+        parent::before($actionMethod);
+
+    }
+
 
     /**
      * Загрузка формы регистрации в диалоговое окно
@@ -33,6 +46,12 @@ class AuthController extends ControllerBase
      */
     public function register2Action($uri)
     {
+        if (! isset($_POST['hash']) || ! $this->checkFormHash($_POST['hash'])) {
+            echo json_encode(array('status' => 'error', 'hash' => $this->generateFormHash(),
+                'message' => '<b>Отправка не удалась, попробуйте ещё раз.</b><br/>
+Возможно у Вашего браузера отключены Cookies.'));
+            return;
+        }
         if (! isset($_POST['first_name']) || ! strlen($_POST['first_name'])
             || ! isset($_POST['last_name']) || ! strlen($_POST['last_name'])
             || ! preg_match('~' . self::RESTRICT_NAME_REGEXP . '~u', $_POST['first_name'] . $_POST['last_name'])) {
@@ -40,7 +59,7 @@ class AuthController extends ControllerBase
 В целях корректной обработки платежей, используйте настоящие имя и фамилию.'));
             return;
         }
-        $len = max(mb_strlen($_POST['first_name'], 'UTF-8'), mb_strlen($_POST['last_name'], 'UTF-8'));
+        $len = max(mb_strlen($_POST['first_name']), mb_strlen($_POST['last_name']));
         if ($len > self::RESTRICT_NAME_MAX_LENGTH) {
             echo json_encode(array('status' => 'error', 'message' => '<b>Допускаются имена и фамилии не длинее ' . self::RESTRICT_NAME_MAX_LENGTH . ' символов</b><br/>
 Введите Ваши имя и фамилию.'));
@@ -64,6 +83,12 @@ class AuthController extends ControllerBase
      */
     public function register3Action($uri)
     {
+        if (! isset($_POST['hash']) || ! $this->checkFormHash($_POST['hash'])) {
+            echo json_encode(array('status' => 'error', 'hash' => $this->generateFormHash(),
+                'message' => '<b>Отправка не удалась, попробуйте ещё раз.</b><br/>
+Возможно у Вашего браузера отключены Cookies.'));
+            return;
+        }
         if (! isset($_POST['email']) || ! strlen($_POST['email'])) {
             echo json_encode(array('status' => 'error', 'message' => '<b>Пожалуйста, укажите Ваш Email.</b><br/>
 На данном этапе немедленного подтверждения адреса Email не потребуется.'));
@@ -96,12 +121,18 @@ class AuthController extends ControllerBase
      */
     public function register4Action($uri)
     {
+        if (! isset($_POST['hash']) || ! $this->checkFormHash($_POST['hash'])) {
+            echo json_encode(array('status' => 'error', 'hash' => $this->generateFormHash(),
+                'message' => '<b>Отправка не удалась, попробуйте ещё раз.</b><br/>
+Возможно у Вашего браузера отключены Cookies.'));
+            return;
+        }
         if (! isset($_POST['password']) || ! strlen($_POST['password'])) {
             echo json_encode(array('status' => 'error', 'message' => '<b>Пожалуйста, выберите пароль.</b><br/>
 Введите и запомните Ваш пароль для входа.'));
             return;
         }
-        $len = mb_strlen($_POST['password'], 'UTF-8');
+        $len = mb_strlen($_POST['password']);
         if ($len < self::RESTRICT_PASSWORD_MIN_LENGTH || $len > self::RESTRICT_PASSWORD_MAX_LENGTH) {
             echo json_encode(array('status' => 'error', 'message' => '<b>Длина пароля должна быть от ' . self::RESTRICT_PASSWORD_MIN_LENGTH . ' до ' . self::RESTRICT_PASSWORD_MAX_LENGTH . ' символов</b><br/>
 Пожалуйста, выберите пароль подходящей длины.'));
@@ -127,7 +158,61 @@ class AuthController extends ControllerBase
         }
         $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT, array('cost' => 11));
         $user->writeData('password_hash', $password_hash);
+        $this->_saveLogin($user);
         echo json_encode(array('status' => 'redirect', 'url' => '/'));
+    }
+
+    /**
+     * Загрузка формы входа в диалоговое окно
+     *
+     * @author oleg
+     * @return void
+     */
+    public function loginAction()
+    {
+        $this->renderView();
+    }
+
+    /**
+     * Проверка логина и пароля, AJAX ответ либо редирект
+     *
+     * @author oleg
+     * @return void
+     */
+    public function login2Action()
+    {
+        if (! isset($_POST['hash']) || ! $this->checkFormHash($_POST['hash'])) {
+            echo json_encode(array('status' => 'error', 'hash' => $this->generateFormHash(),
+                'message' => '<b>Отправка не удалась, попробуйте ещё раз.</b><br/>
+Возможно у Вашего браузера отключены Cookies.'));
+            return;
+        }
+        if (! isset($_POST['email']) || ! isset($_POST['password'])
+            || (! $user = User::findOneBy('email', mb_substr($_POST['email'], 0, 255)))
+            || ! password_verify(mb_substr($_POST['password'], 0, 255), $user->data['password_hash'])) {
+            echo json_encode(array('status' => 'error', 'message' => '<b>Не удается войти.</b><br/>
+Пожалуйста, проверьте правильность написания <b>логина</b> и <b>пароля</b>.<br/>
+Проверьте <b>раскладку</b> клавиатуры и клавишу CAPS LOCK.'));
+            return;
+        }
+        $this->_saveLogin($user);
+        echo json_encode(array('status' => 'redirect', 'url' => '/'));
+    }
+
+    /**
+     * Выход
+     *
+     * @author oleg
+     * @return void
+     */
+    public function logoutAction()
+    {
+        if (! isset($_GET['hash']) || ! $this->checkFormHash($_GET['hash'], 'logout')) {
+            $this->redirect('/');
+            return;
+        }
+        $this->_logout();
+        $this->redirect('/');
     }
 
     /**
@@ -162,4 +247,66 @@ class AuthController extends ControllerBase
         }
         return isset($_SESSION['reg_data']) ? $_SESSION['reg_data'] : array();
     }
+
+    /**
+     * Запоминает вошедшего пользователя в сессии
+     *
+     * @author oleg
+     * @param @param User - авторизованный пользователь
+     * @return void
+     */
+    private function _saveLogin($user)
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['logined'] = $user->data;
+    }
+
+    /**
+     * Выход
+     *
+     * @author oleg
+     * @return void
+     */
+    private function _logout()
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['logined'] = null;
+    }
+
+    /**
+     * Проверяет, авторизован ли пользователь
+     *
+     * @author oleg
+     * @return bool
+     */
+    public static function isLogined()
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        return ! empty($_SESSION['logined']);
+    }
+
+    /**
+     * Возвращает данные авторизованного пользователя
+     *
+     * @author oleg
+     * @return array | null
+     */
+    public static function getLoginedUser()
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (empty($_SESSION['logined'])) {
+            return null;
+        } else {
+            return $_SESSION['logined'];
+        }
+    }
+
 }

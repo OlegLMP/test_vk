@@ -6,6 +6,9 @@ define('APPLICATION_ROOT', realpath(__DIR__ . '/../'));
 
 // Настройка локали
 setlocale(LC_CTYPE, "ru_RU.utf8");
+if (function_exists('mb_internal_encoding')) {
+    mb_internal_encoding('UTF-8');
+}
 
 set_include_path(implode(PATH_SEPARATOR, array(
         APPLICATION_ROOT . '/app/models',

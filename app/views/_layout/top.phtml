@@ -15,7 +15,13 @@
     <div class="logo">УСВАЗ</div>
 </a>
 <div class="auth-links">
+    <?php if ($data = AuthController::getLoginedUser()): ?>
+    Здравствуйте, <?php echo $data['first_name']; ?> <?php echo $data['last_name'] ?>!
+    <a href="/auth/logout?hash=<?php echo ControllerBase::generateFormHash('logout'); ?>">Выйти</a>
+    <?php else: ?>
+    <a href="#dialog" name="modal" url="/auth/login">Вход</a>
     <a href="#dialog" name="modal" url="/auth/register">Регистрация</a>
+    <?php endif; ?>
 </div>
 <div class="clear"></div>
 </div>

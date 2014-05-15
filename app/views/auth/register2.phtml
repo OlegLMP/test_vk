@@ -2,9 +2,10 @@
 <div class="input-field">
     <label for="email">Введите Email</label>
     <input type="text" name="email" id="email" value="" class="fieldCheck"
-        params='<?php echo json_encode(array(array('form', 'EmailAddress'), array('form', 'EmailNotExists'))); ?>'>
+        params='<?php echo json_encode(array(array('form', 'EmailAddress'), array('form', 'EmailNotExists'))); ?>' />
 </div>
 <div class="clear"></div>
+<input type="hidden" name="hash" value="<?php echo ControllerBase::generateFormHash(); ?>" />
 <div class="input-button">
 <button>
     <span>Продолжить</span>
