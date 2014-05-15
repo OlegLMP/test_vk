@@ -52,10 +52,16 @@ $(document).ready(function() {
 		$('.window').hide();
 	});	
 	
-	$(document).on('blur change DOMAutoComplete AutoComplete', "input[type='text'], input[type='password'], textarea, select",
-		    function() {$("label[for='" + $(this).attr('id') + "']").css("textIndent", ($.trim($(this).val()) == '') ? "0px" : "-9999px");}
-		).on('focus', "input[type='text'], input[type='password'], textarea, select", 
-			function() {$("label[for='" + $(this). attr('id') + "']").css("textIndent", "-9999px");}
+	//placeholders
+	$(document).on('blur change DOMAutoComplete AutoComplete focus keydown keyup', "input[type='text'], input[type='password'], textarea, select",
+	    function(event) {
+			var label = $("label[for='" + $(this).attr('id') + "']");
+			if ($(this).val() == '' && event.type != 'keydown') {
+				label.fadeTo("fast", $(this).is(":focus") || event.type == 'focusin' ? 0.5 : 1);
+			} else {
+				label.css("display", "none");
+			}
+		}
 	);
 	
 });

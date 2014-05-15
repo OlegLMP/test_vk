@@ -110,9 +110,10 @@ div.logo {
 }
 .input-field {
     position: relative;
+    min-height: 47px;
 }
 #dialog form {
-	width: 250px;
+	width: 228px;
 	margin: 0px auto;
 }
 #dialog form input {
@@ -155,7 +156,24 @@ div.logo {
 	width: 200px;
     padding: 7px 16px;
 }
-.fieldCheckStatusChecking:after { content: url(/img/ico/fieldcheck/redo.gif); margin: 0 3px; }
-.fieldCheckStatusOk { background: url(/img/ico/fieldcheck/apply.png); margin: 0 3px; width: 22px; height: 22px; display: block; float: left; }
-.fieldCheckStatusError { background: url(/img/ico/fieldcheck/button_cancel.png); margin: 0 3px; width: 22px; height: 22px;display: block; float: left;  }
-.fieldCheckStatusText {color: red;margin-bottom: 7px; font-size: 10px; display: block; float: left; text-align: center;}
+.fieldCheckStatusChecking { background: url(/img/ico/fieldcheck/redo.gif); margin: 7px 3px; width: 22px; height: 22px; display: block; float: left; }
+.fieldCheckStatusOk { background: url(/img/ico/fieldcheck/apply.png); margin: 7px 3px; width: 22px; height: 22px; display: block; float: left; }
+.fieldCheckStatusError { background: url(/img/ico/fieldcheck/button_cancel.png); margin: 7px 3px; width: 22px; height: 22px;display: block; float: left;  }
+.fieldCheckStatusText {color: red; font-size: 10px; display: block; clear: both;}
+.dialogMessageBox {
+	position: relative;
+	}
+.dialogMessageBorder {
+    background-color: rgb(244, 235, 189);
+    border: 1px solid;
+    border-color: rgb(212, 188, 76);
+    padding: 8px 11px;
+    opacity: 0;
+    position: absolute;
+    top: 0px;
+}
+.dialogMessage {
+    line-height: 140%;
+    padding: 8px 11px;
+    position: relative;
+}

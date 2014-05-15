@@ -71,6 +71,7 @@ abstract class ControllerBase
     {
         if (! $this->isAjax) {
             $content = ob_get_clean();
+            ob_end_clean();
             $this->renderView('_layout/top', array('jsScripts' => $this->jsScripts));
             echo $content;
             $this->renderView('_layout/bottom');

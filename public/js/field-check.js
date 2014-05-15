@@ -1,6 +1,13 @@
 /**
  * Проверка полей
  */
+
+function JSONToObject(data) {
+    try {
+        return eval("(" + data + ")");
+    } catch (Exception) { }
+}
+
 function FieldCheck(params)
 {
     /**
@@ -77,7 +84,7 @@ function FieldCheck(params)
             clearTimeout(this.tmFilter);
         }
         if (!delay) {
-            delay = 5000;
+            delay = 500;
         }
         this.tmFilter = setTimeout(this.doApplyFilter, delay, this);
     };

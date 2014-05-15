@@ -36,7 +36,8 @@ class WebHandler
      */
     public function process($requestUri)
     {
-        $path = explode('/', $requestUri);
+        $path = parse_url($requestUri, PHP_URL_PATH);
+        $path = explode('/', $path);
         array_shift($path);
         if (($pathCount = count($path)) && ! strlen($path[$pathCount - 1])) {
             unset($path[$pathCount - 1]);
