@@ -3,3 +3,26 @@
 <b>Пожалуйста, укажите Ваше имя и фамилию.</b><br/>
 В целях корректной обработки платежей, используйте настоящие имя и фамилию.
 </div>
+<form>
+<div class="input-label">Ваше имя</div>
+<div class="input-field">
+    <label for="firstname">Введите имя</label>
+    <input type="text" name="firstname" id="firstname" value="" class="fieldCheck">
+</div>
+<div class="clear"></div>
+<div class="input-label">Ваша фамилия</div>
+<div class="input-field">
+    <label for="lastname">Введите фамилию</label>
+    <input type="text" name="lastname" id="lastname" value="" class="fieldCheck">
+</div>
+<div class="clear"></div>
+<div class="input-button">
+<button id="join_submit_button" onclick="alert(1)">
+    <span class="join_with_arr">Зарегистрироваться</span>
+</button>
+</div>
+</form>
+
+<script>
+FieldCheck.initAll();
+</script>

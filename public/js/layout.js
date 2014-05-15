@@ -1,5 +1,5 @@
 $(document).ready(function() {	
-
+	
 	//select all the a tag with name equal to modal
 	$('a[name=modal]').click(function(e) {
 		//Cancel the link behavior
@@ -50,6 +50,13 @@ $(document).ready(function() {
 	$('#mask').click(function () {
 		$(this).hide();
 		$('.window').hide();
-	});			
+	});	
+	
+	$(document).on('blur change DOMAutoComplete AutoComplete', "input[type='text'], input[type='password'], textarea, select",
+		    function() {$("label[for='" + $(this).attr('id') + "']").css("textIndent", ($.trim($(this).val()) == '') ? "0px" : "-9999px");}
+		).on('focus', "input[type='text'], input[type='password'], textarea, select", 
+			function() {$("label[for='" + $(this). attr('id') + "']").css("textIndent", "-9999px");}
+	);
 	
 });
+

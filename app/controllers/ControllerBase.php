@@ -40,6 +40,7 @@ abstract class ControllerBase
         $this->viewsDir = realpath(__DIR__ . '/../views');
         $this->jsScripts[] = '/js/jquery-1.11.1.min.js';
         $this->jsScripts[] = '/js/layout.js';
+        $this->jsScripts[] = '/js/field-check.js';
     }
 
     /**
