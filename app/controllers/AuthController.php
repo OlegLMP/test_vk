@@ -14,20 +14,6 @@ class AuthController extends ControllerBase
     public $isAjax = true;
 
     /**
-     * Работа до вызова Action метода
-     *
-     * @author oleg
-     * @param string $actionMethod - имя Action метода, который планируется вызвать
-     * @return void
-     */
-    public function before($actionMethod)
-    {
-        parent::before($actionMethod);
-
-    }
-
-
-    /**
      * Загрузка формы регистрации в диалоговое окно
      *
      * @author oleg
@@ -159,7 +145,7 @@ class AuthController extends ControllerBase
         $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT, array('cost' => 11));
         $user->writeData('password_hash', $password_hash);
         $this->_saveLogin($user);
-        echo json_encode(array('status' => 'redirect', 'url' => '/'));
+        echo json_encode(array('status' => 'redirect', 'url' => '/customer'));
     }
 
     /**
@@ -196,7 +182,7 @@ class AuthController extends ControllerBase
             return;
         }
         $this->_saveLogin($user);
-        echo json_encode(array('status' => 'redirect', 'url' => '/'));
+        echo json_encode(array('status' => 'redirect', 'url' => $user->data['role'] == UserRole::ID_CUSTOMER ? '/customer' : '/executor'));
     }
 
     /**
@@ -208,7 +194,7 @@ class AuthController extends ControllerBase
     public function logoutAction()
     {
         if (! isset($_GET['hash']) || ! $this->checkFormHash($_GET['hash'], 'logout')) {
-            $this->redirect('/');
+            $this->redirect('/?wrong_hash=1');
             return;
         }
         $this->_logout();

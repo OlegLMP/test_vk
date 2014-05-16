@@ -46,13 +46,12 @@ div.bottom {
     font-size: 8pt;
 }
 div.logo {
-    background: url('/img/logo-40x40.png') no-repeat;
-    min-height: 40px;
-    padding-left: 50px;
+    background: url('/img/system_64x64.png') no-repeat;
+    min-height: 54px;
+    padding-top: 10px;
+    padding-left: 70px;
     float: left;
     font-size: 32px;
-    margin-top: 4px;
-    margin-bottom: 4px;
 }
 .clear {
   float: none;
@@ -61,7 +60,11 @@ div.logo {
 .auth-links {
     float: right;
     font-size: 16px;
-    margin-top: 14px;
+    margin-top: 26px;
+    margin-right: 20px;
+}
+.auth-links a {
+	margin: 0px 10px;
 }
 
 #mask {
@@ -136,7 +139,7 @@ div.logo {
     width: auto;
     display: inline;
     float: none;
-    margin: 10px 10px ;
+    margin: 10px 10px;
     font-size: 12px;
     color: #CCCCCC;
     position: absolute;
@@ -180,4 +183,14 @@ div.logo {
 }
 .button-wait {
 	display: none;
+}
+.indexpage-title {
+	font-size: 20px;
+	text-align: center;
+}
+.indexpage-image {
+    float: left;
+}
+.indexpage-step1 {
+    float: right;
 }

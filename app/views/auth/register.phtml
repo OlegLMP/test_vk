@@ -11,7 +11,7 @@
 <div class="input-field">
     <label for="first_name">Введите имя</label>
     <input type="text" name="first_name" id="first_name" value="" class="fieldCheck"
-        params="<?php echo htmlspecialchars(json_encode(array(
+        params="<?php echo F::escape(json_encode(array(
             array('local', 'regExp', AuthController::RESTRICT_NAME_REGEXP),
             array('local', 'stringLength', 1, AuthController::RESTRICT_NAME_MAX_LENGTH),
         ))); ?>" />
@@ -21,13 +21,13 @@
 <div class="input-field">
     <label for="last_name">Введите фамилию</label>
     <input type="text" name="last_name" id="last_name" value="" class="fieldCheck"
-        params="<?php echo htmlspecialchars(json_encode(array(
+        params="<?php echo F::escape(json_encode(array(
             array('local', 'regExp', AuthController::RESTRICT_NAME_REGEXP),
             array('local', 'stringLength', 1, AuthController::RESTRICT_NAME_MAX_LENGTH),
         ))); ?>" />
 </div>
 <div class="clear"></div>
-<input type="hidden" name="hash" value="<?php echo ControllerBase::generateFormHash(); ?>" />
+<?php echo ControllerBase::getCsrfProtection(); ?>
 <div class="input-button">
 <button>
     <span class="button-text">Зарегистрироваться</span>

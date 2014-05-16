@@ -205,4 +205,16 @@ class F
             'MEMORY_REAL_NOW = ' . F::formatBytes(F::memory_get_usage()) . "\n";
     }
 
+    /**
+     * эскепирование вывода HTML. Текст и параметры, ограниченный двойными кавычками.
+     *
+     * @author oleg
+     * @param string $text - текст, который требуется эскепировать
+     * @return string
+     */
+    public static function escape($text)
+    {
+        return htmlspecialchars($text);
+    }
+
 }

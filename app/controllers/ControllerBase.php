@@ -113,6 +113,18 @@ abstract class ControllerBase
      * Проверка хэша CSRF защиты формы
      *
      * @author oleg
+     * @param string $formName - имя формы. Необходимо задать, если нужны несколько разных токенов на странице
+     * @return string - HTML код, содержащий input типа hidden со значением хэша
+     */
+    public static function getCsrfProtection($formName = '')
+    {
+        return '<input type="hidden" name="hash" value="' . F::escape(self::generateFormHash($formName)) . '" />';
+    }
+
+    /**
+     * Проверка хэша CSRF защиты формы
+     *
+     * @author oleg
      * @param $hash - переданный хэш
      * @param string $formName - имя формы, с которым генерился токен
      * @return bool - true при удачное проверке, иначе false
@@ -143,4 +155,5 @@ abstract class ControllerBase
         header('Location: ' . $link);
         exit();
     }
+
 }

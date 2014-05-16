@@ -6,9 +6,7 @@
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
- `is_customer` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT "Может выступать в роли заказчика",
- `is_executor` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT "Может выступать в роли исполнителя",
- `last_role` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT "->user_role.id В какой роли выступал",
+ `role` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT "->user_role.id Роль|В какой роли выступает: заказчик или исполнитель",
  `email` varchar(50) NOT NULL COMMENT "E-Mail",
  `first_name` VARCHAR(255) NOT NULL COMMENT "Имя",
  `last_name` VARCHAR(255) NOT NULL COMMENT "Фамилия",
