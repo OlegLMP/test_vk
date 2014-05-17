@@ -1,0 +1,30 @@
+<div class="dialogTitle">Выполнение заказа</div>
+<div class="dialogMessageBox">
+    <div class="dialogMessageBorder"></div>
+    <div class="dialogMessage">
+        <b><?php echo $params['message']; ?></b>
+    </div>
+</div>
+<div class="message-close-button-container">
+    <div class="input-button">
+    <button class="close">
+        <span class="button-text">Закрыть</span>
+    </button>
+    </div>
+</div>
+
+<script>
+$(".message-close-button-container button").focus();
+</script>
+
+<?php if (isset($params['balance'])): ?>
+<script>
+$(".balance-sum").text("<?php echo F::formatMoney($params['loginedUser']->data['balance']); ?>");
+</script>
+<?php endif; ?>
+
+<?php if (isset($params['ordersExecuted'])): ?>
+<script>
+$(".executor-order-count").text("<?php echo $params['ordersExecuted']; ?>");
+</script>
+<?php endif; ?>

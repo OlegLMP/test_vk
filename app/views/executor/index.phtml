@@ -1,9 +1,9 @@
 <div class="indexpage-title">Кабинет исполнителя</div>
 <div class="balance-container">
     <div class="balance-title">У Вас на счету</div>
-    <div class="balance-sum">
+    <div>
         <img class="balance-img" src="/img/ico/wallet-32x32.png">
-        <?php echo F::formatMoney($params['loginedUser']->data['balance']); ?>
+        <span class="balance-sum"><?php echo F::formatMoney($params['loginedUser']->data['balance']); ?></span>
     </div>
 </div>
 
@@ -38,6 +38,9 @@
 <script>
 $(function(){
 	new Scroller($(".table-orders-container"), "/executor/update", "<?php echo $params['sortBy']; ?>", "<?php echo $params['sortDirection'] ?>", "<?php echo $order[$params['sortBy']]; ?>", <?php echo $order['id']; ?>);
+	$(document).on('click', '.table-orders-row .col-action a', function(event){
+		   $(event.target).parent().parent().remove();
+	});
 });
 </script
 <?php else: ?>

@@ -12,6 +12,7 @@ CREATE TABLE `order` (
  `commission` DECIMAL(18,2) NOT NULL COMMENT "Комиссия|Комиссия системы",
  `executor_fee` DECIMAL(18,2) NOT NULL COMMENT "Плата|Плата исполнителю за выполнение заказа",
  `executor` INT UNSIGNED COMMENT "->user.id Исполнитель",
+ `locked` TINYINT UNSIGNED NOT NULL COMMENT "Флаг блокировки для транзакций",
  `created` TIMESTAMP NOT NULL DEFAULT "0000-00-00 00:00:00" COMMENT "Создан",
  `updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Изменён",
  PRIMARY KEY (`id`),

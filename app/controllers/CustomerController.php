@@ -96,7 +96,7 @@ LIMIT 1', PDO::FETCH_COLUMN);
 Пожалуйста, введите подходящую сумму.'));
             return;
         }
-        if (! Transaction::refillTransaction($this->getLoginedUser(), $amount)) {
+        if (! Transaction::transactionRefill($this->getLoginedUser(), $amount)) {
             echo json_encode(array('status' => 'error', 'message' => '<b>Не удалось выполнить операцию.</b><br/>
 Обратитесь в техподдержку.'));
             return;
@@ -148,7 +148,7 @@ LIMIT 1', PDO::FETCH_COLUMN);
 Пожалуйста, <a href="#dialog" name="modal" url="/customer/refill">пополните</a> ваш счёт либо введите меньшую сумму.'));
             return;
         }
-        if (! Transaction::neworderTransaction($this->getLoginedUser(), $amount)) {
+        if (! Transaction::transactionNewOrder($this->getLoginedUser(), $amount)) {
             echo json_encode(array('status' => 'error', 'message' => '<b>Не удалось выполнить операцию.</b><br/>
 Обратитесь в техподдержку.'));
             return;

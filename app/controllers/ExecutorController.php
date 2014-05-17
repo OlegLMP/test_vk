@@ -41,6 +41,25 @@ ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection
     }
 
     /**
+     * подготовка данных для кабинета исполнителя
+     *
+     * @author oleg
+     * @return array
+     */
+    private function _getParams()
+    {
+        $db = Db::get(Order::$dbConfigSection);
+        $ordersExecuted = $db->sql('SELECT count(*) FROM ' . Db::name('order') . '
+WHERE executor=' . $db->prepare($this->getLoginedUser()->key) . '
+&&status=' . OrderStatus::ID_EXECUTED . '
+LIMIT 1', PDO::FETCH_COLUMN);
+        return array(
+            'loginedUser'  => $this->getLoginedUser(),
+            'ordersExecuted' => $ordersExecuted,
+        );
+    }
+
+    /**
      * AJAX запрос на получение очередной порции заказов
      *
      * @author oleg
@@ -87,131 +106,28 @@ ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection
     }
 
     /**
-     * подготовка данных для кабинета исполнителя
-     *
-     * @author oleg
-     * @return array
-     */
-    private function _getParams()
-    {
-        $db = Db::get(Order::$dbConfigSection);
-        $ordersExecuted = $db->sql('SELECT count(*) FROM ' . Db::name('order') . '
-WHERE executor=' . $db->prepare($this->getLoginedUser()->key) . '
-&&status=' . OrderStatus::ID_EXECUTED . '
-LIMIT 1', PDO::FETCH_COLUMN);
-        return array(
-            'loginedUser'  => $this->getLoginedUser(),
-            'ordersExecuted' => $ordersExecuted,
-        );
-    }
-
-    /**
-     * Диалоговое окно пополнения счёта
+     * выполнение заказа
      *
      * @author oleg
      * @return void
      */
-    public function refillAction($uri)
+    public function execorderAction($uri)
     {
         $this->isAjax = true;
-        $this->renderView();
+        $orderId = array_shift(explode('/', substr($uri, 1)));
+        if (! $orderId || ! $order = Order::find($orderId)) {
+            return $this->renderView(array('message' => 'Ошибка передачи данных.'));
+        }
+        if ($order->data['status'] != OrderStatus::ID_NEW) {
+            return $this->renderView(array('message' => 'Извините, заказ уже выполнил кто-то другой'));
+        }
+        if (! Transaction::transactionExecOrder($this->getLoginedUser(), $order)) {
+            return $this->renderView(array('message' => 'Извините, выполнение заказа не удалось, возможно заказ уже выполнил кто-то другой.'));
+        }
+        $this->renderView(array(
+            'message' => 'Заказ выполнен успешно. На ваш счёт зачислена плата за выполнение заказа.',
+            'balance' => $this->getLoginedUser()->data['balance']
+        ) + $this->_getParams());
     }
 
-    /**
-     * AJAX ответ на пополнение счёта, редирект
-     *
-     * @author oleg
-     * @return void
-     */
-    public function refill2Action($uri)
-    {
-        $this->isAjax = true;
-        if (! isset($_POST['hash']) || ! $this->checkFormHash($_POST['hash'])) {
-            echo json_encode(array('status' => 'error', 'hash' => $this->generateFormHash(),
-                'message' => '<b>Отправка не удалась, попробуйте ещё раз.</b><br/>
-Возможно у Вашего браузера отключены Cookies.'));
-            return;
-        }
-        if (! isset($_POST['amount']) || ! strlen($_POST['amount'])) {
-            echo json_encode(array('status' => 'error', 'message' => '<b>Пожалуйста, введите сумму.</b><br/>
-Выберите и введите сумму, которую вы хотите положить на Ваш счёт в системе УСВАЗ.'));
-            return;
-        }
-        $amount = str_replace(' ', '', $_POST['amount']);
-        $amount = round($amount, 2);
-        if ($amount < self::RESTRICT_REFILL_MIN || $amount > self::RESTRICT_REFILL_MAX) {
-            echo json_encode(array('status' => 'error', 'message' => '<b>Сумма может должна быть от ' . self::RESTRICT_REFILL_MIN . ' до ' . self::RESTRICT_REFILL_MAX . '</b><br/>
-Пожалуйста, введите подходящую сумму.'));
-            return;
-        }
-        if (! Transaction::refillTransaction($this->getLoginedUser(), $amount)) {
-            echo json_encode(array('status' => 'error', 'message' => '<b>Не удалось выполнить операцию.</b><br/>
-Обратитесь в техподдержку.'));
-            return;
-        }
-        echo json_encode(array('status' => 'redirect', 'url' => '/customer'));
-    }
-
-    /**
-     * Диалоговое окно размещения заказа
-     *
-     * @author oleg
-     * @return void
-     */
-    public function neworderAction($uri)
-    {
-        $this->isAjax = true;
-        $this->renderView();
-    }
-
-    /**
-     * AJAX ответ на размещение заказа, редирект
-     *
-     * @author oleg
-     * @return void
-     */
-    public function neworder2Action($uri)
-    {
-        $this->isAjax = true;
-        if (! isset($_POST['hash']) || ! $this->checkFormHash($_POST['hash'])) {
-            echo json_encode(array('status' => 'error', 'hash' => $this->generateFormHash(),
-                'message' => '<b>Отправка не удалась, попробуйте ещё раз.</b><br/>
-Возможно у Вашего браузера отключены Cookies.'));
-            return;
-        }
-        if (! isset($_POST['amount']) || ! strlen($_POST['amount'])) {
-            echo json_encode(array('status' => 'error', 'message' => '<b>Пожалуйста, введите сумму.</b><br/>
-Выберите и введите сумму, которую вы хотите заплатить за выполнение вашего заказа.'));
-            return;
-        }
-        $amount = str_replace(' ', '', $_POST['amount']);
-        $amount = round($amount, 2);
-        if ($amount < self::RESTRICT_ORDER_COST_MIN || $amount > self::RESTRICT_ORDER_COST_MAX) {
-            echo json_encode(array('status' => 'error', 'message' => '<b>Сумма может должна быть от ' . self::RESTRICT_ORDER_COST_MIN . ' до ' . self::RESTRICT_ORDER_COST_MAX . '</b><br/>
-Пожалуйста, введите подходящую сумму.'));
-            return;
-        }
-        if ($amount > $this->getLoginedUser()->data['balance']) {
-            echo json_encode(array('status' => 'error', 'message' => '<b>На Вашем счёте не достаточно средств</b><br/>
-Пожалуйста, <a href="#dialog" name="modal" url="/customer/refill">пополните</a> ваш счёт либо введите меньшую сумму.'));
-            return;
-        }
-        if (! Transaction::neworderTransaction($this->getLoginedUser(), $amount)) {
-            echo json_encode(array('status' => 'error', 'message' => '<b>Не удалось выполнить операцию.</b><br/>
-Обратитесь в техподдержку.'));
-            return;
-        }
-        echo json_encode(array('status' => 'redirect', 'url' => '/customer/wait'));
-    }
-
-    /**
-     * Страница успешного размещения заказа
-     *
-     * @author oleg
-     * @return void
-     */
-    public function waitAction($uri)
-    {
-        $this->renderView($this->_getParams());
-    }
 }

@@ -19,7 +19,7 @@ class Transaction extends ActiveRecord
      * @param float $amount - сумма, на которую пополняется счёт
      * @return bool - true, если удалось выполнить транзакцию, иначе false
      */
-    public static function refillTransaction($user, $amount)
+    public static function transactionRefill($user, $amount)
     {
         // Проверка входных данных
         $user = User::checkOrFind($user);
@@ -87,7 +87,7 @@ class Transaction extends ActiveRecord
      * @param float $amount - стоимость заказа
      * @return bool - true, если удалось выполнить транзакцию, иначе false
      */
-    public static function neworderTransaction($user, $amount)
+    public static function transactionNewOrder($user, $amount)
     {
         // Проверка входных данных
         $user = User::checkOrFind($user);
@@ -130,25 +130,25 @@ class Transaction extends ActiveRecord
         // 1) Изменяем баланс у пользователя
         $transaction->_change($user, 'balance', $user->data['balance'] - $amount, - $amount);
 
-        // 2) Заносим проводку по бухгалтерскому счёту "Счет заказчиков"
-        $transaction->_create('BookkeepingAccountEntry', array(
-            'bookkeeping_account' => BookkeepingAccount::ID_CUSTOMERS_BALANCE,
-            'amount'              => - $amount,
-            'class'               => 'User',
-            'model'               => $user->key,
-            'comment'             => 'Размещение заказа заказчиком'
-        ), $amount);
-
-        // 3) Изменяем баланс бухгалтерского счёта "Счет заказчиков"
-        $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_CUSTOMERS_BALANCE, 'balance', - $amount);
-
-        // 4) Создаём заказ
+        // 2) Создаём заказ
         $order = $transaction->_create('Order', array(
             'customer'     => $user->key,
             'total_cost'   => $amount,
             'commission'   => $commission,
             'executor_fee' => $amount - $commission,
         ), $amount);
+
+        // 3) Заносим проводку по бухгалтерскому счёту "Счет заказчиков"
+        $transaction->_create('BookkeepingAccountEntry', array(
+            'bookkeeping_account' => BookkeepingAccount::ID_CUSTOMERS_BALANCE,
+            'amount'              => - $amount,
+            'class'               => 'Order',
+            'model'               => $order->key,
+            'comment'             => 'Размещение заказа заказчиком'
+        ), - $amount);
+
+        // 4) Изменяем баланс бухгалтерского счёта "Счет заказчиков"
+        $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_CUSTOMERS_BALANCE, 'balance', - $amount);
 
         // 5) Заносим проводку по бухгалтерскому счёту "Фонд оплаты заказов"
         $transaction->_create('BookkeepingAccountEntry', array(
@@ -161,6 +161,100 @@ class Transaction extends ActiveRecord
 
         // 6) Изменяем баланс бухгалтерского счёта "Фонд оплаты заказов"
         $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_ORDERS_FUND, 'balance', $amount);
+
+        //Снимаем блокировки
+        $transaction->_unlock($locked);
+
+        // Завершаем транзакцию
+        $transaction->writeData('status', TransactionStatus::ID_COMPLETED);
+        return true;
+    }
+
+    /**
+     * Транзакция 3. Выполнение заказа.
+     *
+     * @author oleg
+     * @param User|int $user - пользователь, исполнитель
+     * @param Order|int $order - заказ
+     * @return bool - true, если удалось выполнить транзакцию, иначе false
+     */
+    public static function transactionExecOrder($user, $order)
+    {
+        // Проверка входных данных
+        $user = User::checkOrFind($user);
+        $order = Order::checkOrFind($order);
+        if ($order->data['status'] != OrderStatus::ID_NEW) {
+            throw new AppException('Ошибочный статус заказа');
+        }
+
+        // Открытие транзакции
+        $transaction = self::create(array(
+            'type'      => TransactionType::ID_ORDER_EXECUTING,
+            'initiator' => Initiator::createInitiatorKey(),
+            'amount'    => $order->data['executor_fee'],
+        ));
+        // Блокировка моделей
+        if (! $locked = $transaction->_lock(array($user, $order))) {
+            return false;
+        }
+
+        // Проверка данных в транзакции
+        if ($order->data['status'] != OrderStatus::ID_NEW) {
+            $transaction->writeData('status', TransactionStatus::ID_CHECK_FAILED);
+            //Снимаем блокировки
+            $transaction->_unlock($locked);
+            // Отменяем транзакцию
+            $transaction->writeData('status', TransactionStatus::ID_CANCELED);
+            return false;
+        }
+        $transaction->writeData('status', TransactionStatus::ID_CHECKED);
+
+        // Совершение действий в транзакции
+
+        // 1) Меняем статус заказа
+        $transaction->_change($order, 'status', OrderStatus::ID_EXECUTED);
+
+        // 2) Заносим проводку по бухгалтерскому счёту "Фонд оплаты заказов"
+        $transaction->_create('BookkeepingAccountEntry', array(
+            'bookkeeping_account' => BookkeepingAccount::ID_ORDERS_FUND,
+            'amount'              => - $order->data['total_cost'],
+            'class'               => 'Order',
+            'model'               => $order->key,
+            'comment'             => 'Выполнение заказа исполнителем'
+        ), - $order->data['total_cost']);
+
+        // 3) Изменяем баланс бухгалтерского счёта "Фонд оплаты заказов"
+        $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_ORDERS_FUND, 'balance', - $order->data['total_cost']);
+
+        // 4) Заносим проводку по бухгалтерскому счёту "Счет исполнителей"
+        $transaction->_create('BookkeepingAccountEntry', array(
+            'bookkeeping_account' => BookkeepingAccount::ID_EXECUTORS_BALANCE,
+            'amount'              => $order->data['executor_fee'],
+            'class'               => 'Order',
+            'model'               => $order->key,
+            'comment'             => 'Выполнение заказа'
+        ), $order->data['executor_fee']);
+
+        // 5) Изменяем баланс бухгалтерского счёта "Счет исполнителей"
+        $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_EXECUTORS_BALANCE, 'balance', $order->data['executor_fee']);
+
+        // 6) Заносим проводку по бухгалтерскому счёту "Прибыль"
+        $transaction->_create('BookkeepingAccountEntry', array(
+            'bookkeeping_account' => BookkeepingAccount::ID_PROFIT,
+            'amount'              => $order->data['commission'],
+            'class'               => 'Order',
+            'model'               => $order->key,
+            'comment'             => 'Комиссия за выполнение заказа'
+        ), $order->data['commission']);
+
+        // 7) Изменяем баланс бухгалтерского счёта "Прибыль"
+        $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_PROFIT, 'balance', $order->data['commission']);
+
+        // 8) Устанавливаем исполнителя у заказа
+        $transaction->_change($order, 'executor', $user->key);
+
+        // 9) Зачисляем плату за выполнение заказа на счёт исполнителя
+        $transaction->_change($user, 'balance', $user->data['balance'] + $order->data['executor_fee'], $order->data['executor_fee']);
 
         //Снимаем блокировки
         $transaction->_unlock($locked);
@@ -206,8 +300,9 @@ class Transaction extends ActiveRecord
                     'model'       => $object->key,
                 ), true);
             } else {
-                $this->_unlock($locked);
                 $this->writeData('status', TransactionStatus::ID_LOCK_FAILED);
+                $this->_unlock($locked);
+                $this->writeData('status', TransactionStatus::ID_CANCELED);
                 return false;
             }
         }

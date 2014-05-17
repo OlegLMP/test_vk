@@ -318,3 +318,7 @@ div.balance-container {
    text-align: center;
    margin: 20px 0px;
 }
+.message-close-button-container {
+	margin-top: 150px;
+	text-align: center;
+}

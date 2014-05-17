@@ -40,17 +40,17 @@ $(document).ready(function() {
 	});
 	
 	//if close button is clicked
-	$('.window .close').click(function (e) {
+	$('.window').on('click', '.close', function (e) {
 		//Cancel the link behavior
 		e.preventDefault();
 		$('#mask, .window').hide();
 	});		
 	
 	//if mask is clicked
-	/*$('#mask').click(function () {
+	$('#mask').click(function () {
 		$(this).hide();
 		$('.window').hide();
-	});*/	
+	});
 	
 	//placeholders
 	$(document).on('blur change DOMAutoComplete AutoComplete focus keydown keyup', "input[type='text'], input[type='password'], textarea, select",
