@@ -101,6 +101,7 @@ abstract class ControllerBase
             $path = $this->urls['action'];
         }
         $urls = $this->urls;
+        $controller = $this;
         include $this->viewsDir . (strpos($path, '/') === 0 ? '' : '/') . $path . '.phtml';
     }
 

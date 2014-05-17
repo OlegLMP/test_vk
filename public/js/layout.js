@@ -1,7 +1,7 @@
 $(document).ready(function() {	
 	
 	//select all the a tag with name equal to modal
-	$(document).on('click', 'a[name=modal]', function(e) {
+	$(document).on('click', 'a[name=modal],button[name=modal]', function(e) {
 		//Cancel the link behavior
 		e.preventDefault();
 		//Get the A tag

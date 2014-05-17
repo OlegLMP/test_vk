@@ -226,3 +226,14 @@ div.customer-right-panel {
 	font-size: 14px;
     font-weight: bold;
 }
+.customer-step4 {
+    float: left;
+    margin-left: 150px;
+}
+.customer-register-executor {
+    margin-top: 250px;
+    width: 300px;
+}
+.bottom-links {
+    text-align: right;
+}

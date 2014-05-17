@@ -21,7 +21,20 @@ class AuthController extends ControllerBase
      */
     public function registerAction()
     {
+        $this->_saveInSession('role', UserRole::ID_CUSTOMER);
         $this->renderView();
+    }
+
+    /**
+     * Загрузка формы регистрации исполнителя в диалоговое окно
+     *
+     * @author oleg
+     * @return void
+     */
+    public function regexecutorAction()
+    {
+        $this->_saveInSession('role', UserRole::ID_EXECUTOR);
+        $this->renderView(null, '/auth/register');
     }
 
     /**
@@ -130,7 +143,7 @@ class AuthController extends ControllerBase
             return;
         }
         $regData = $this->_loadFromSession();
-        if (! isset($regData['first_name']) || ! isset($regData['last_name']) || ! $regData['email'] || count($regData) != 3) {
+        if (! isset($regData['first_name']) || ! isset($regData['last_name']) || ! $regData['email'] || ! $regData['role'] || count($regData) != 4) {
             echo json_encode(array('status' => 'error', 'message' => '<b>Ошибка регистрации</b><br/>
 Возможно у Вашего браузера отключены Cookies. Включите их и перезапустите браузер.'));
             return;
@@ -145,7 +158,7 @@ class AuthController extends ControllerBase
         $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT, array('cost' => 11));
         $user->writeData('password_hash', $password_hash);
         $this->_saveLogin($user);
-        echo json_encode(array('status' => 'redirect', 'url' => '/customer'));
+        echo json_encode(array('status' => 'redirect', 'url' => $regData['role'] == UserRole::ID_CUSTOMER ? '/customer' : '/executor'));
     }
 
     /**

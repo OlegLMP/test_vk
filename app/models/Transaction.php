@@ -39,7 +39,7 @@ class Transaction extends ActiveRecord
             return false;
         }
 
-        // Проверка данных в транзакции
+        // Проверка данных в транзакции (не требуется)
         $transaction->writeData('status', TransactionStatus::ID_CHECKED);
 
         // Совершение действий в транзакции
@@ -69,7 +69,92 @@ class Transaction extends ActiveRecord
         $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_PAY_SYSTEM, 'balance', $amount);
 
         // 5) Изменяем баланс у пользователя
-        $transaction->_change($user, 'balance', $user->data['balance'] + $amount);
+        $transaction->_change($user, 'balance', $user->data['balance'] + $amount, $amount);
+
+        //Снимаем блокировки
+        $transaction->_unlock($locked);
+
+        // Завершаем транзакцию
+        $transaction->writeData('status', TransactionStatus::ID_COMPLETED);
+        return true;
+    }
+
+    /**
+     * Транзакция 2. Размещение заказа.
+     *
+     * @author oleg
+     * @param User|int $user - пользователь, заказчик
+     * @param float $amount - стоимость заказа
+     * @return bool - true, если удалось выполнить транзакцию, иначе false
+     */
+    public static function neworderTransaction($user, $amount)
+    {
+        // Проверка входных данных
+        $user = User::checkOrFind($user);
+        $amount = round($amount, 2);
+        if ($amount <= 0) {
+            throw new AppException('Стоимость заказа должна быть больше 0');
+        }
+        if ($user->data['balance'] < $amount) {
+            throw new AppException('Недостаточно средств на балансе заказчика');
+        }
+
+        // Открытие транзакции
+        $transaction = self::create(array(
+            'type'      => TransactionType::ID_ORDER_ADDING,
+            'initiator' => Initiator::createInitiatorKey(),
+            'amount'    => $amount,
+        ));
+        // Блокировка моделей
+        if (! $locked = $transaction->_lock(array($user))) {
+            return false;
+        }
+
+        // Проверка данных в транзакции
+        if ($user->data['balance'] < $amount) {
+            $transaction->writeData('status', TransactionStatus::ID_CHECK_FAILED);
+            //Снимаем блокировки
+            $transaction->_unlock($locked);
+            // Отменяем транзакцию
+            $transaction->writeData('status', TransactionStatus::ID_CANCELED);
+            return false;
+        }
+        $transaction->writeData('status', TransactionStatus::ID_CHECKED);
+
+        // Совершение действий в транзакции
+
+        // 1) Изменяем баланс у пользователя
+        $transaction->_change($user, 'balance', $user->data['balance'] - $amount, - $amount);
+
+        // 2) Заносим проводку по бухгалтерскому счёту "Счет заказчиков"
+        $transaction->_create('BookkeepingAccountEntry', array(
+            'bookkeeping_account' => BookkeepingAccount::ID_CUSTOMERS_BALANCE,
+            'amount'              => - $amount,
+            'class'               => 'User',
+            'model'               => $user->key,
+            'comment'             => 'Размещение заказа заказчиком'
+        ), $amount);
+
+        // 3) Изменяем баланс бухгалтерского счёта "Счет заказчиков"
+        $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_CUSTOMERS_BALANCE, 'balance', - $amount);
+
+        // 4) Создаём заказ
+        $order = $transaction->_create('Order', array(
+            'customer'   => $user->key,
+            'total_cost' => $amount,
+        ), $amount);
+
+        // 5) Заносим проводку по бухгалтерскому счёту "Фонд оплаты заказов"
+        $transaction->_create('BookkeepingAccountEntry', array(
+            'bookkeeping_account' => BookkeepingAccount::ID_ORDERS_FUND,
+            'amount'              => $amount,
+            'class'               => 'Order',
+            'model'               => $order->key,
+            'comment'             => 'Размещение заказа заказчиком'
+        ), $amount);
+
+        // 6) Изменяем баланс бухгалтерского счёта "Фонд оплаты заказов"
+        $transaction->_increment('BookkeepingAccount', BookkeepingAccount::ID_ORDERS_FUND, 'balance', $amount);
 
         //Снимаем блокировки
         $transaction->_unlock($locked);

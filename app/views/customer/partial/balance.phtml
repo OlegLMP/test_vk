@@ -1,0 +1,10 @@
+<div class="balance-container">
+    <div class="balance-title">У Вас на счету</div>
+    <div class="balance-sum">
+        <img class="balance-img" src="/img/ico/wallet-32x32.png">
+        <?php echo F::formatMoney($params['loginedUser']->data['balance']); ?>
+    </div>
+    <div class="balance-links">
+        <a href="#dialog" name="modal" url="/customer/refill">Пополнить</a>
+    </div>
+</div>
