@@ -238,3 +238,83 @@ div.balance-container {
 .bottom-links {
     text-align: right;
 }
+.table-orders-container {
+    width: 600px;
+    margin-left: auto;
+    margin-right:auto;
+    min-height: 900px;
+}
+.table-orders-message {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.table-orders {
+    margin-top: 10px;
+}
+.table-sort-options {
+	font-size: 13px;
+}
+.sort-option {
+    padding: 4px 6px;
+}
+.sort-option a:hover {
+    color: #CC0000;
+}
+.sort-option.active {
+    background: #e8e8e8;
+}
+.sort-option:before {
+	content: ' ';
+    display: inline-block;
+    margin-right: 4px;
+    width: 13px;
+}
+.sort-option.ASC:before {
+    content: "\25B2";
+}
+.sort-option.DESC:before {
+	content: "\25BC";
+}
+.table-orders span.col-date, .table-orders span.col-action {
+    width: 135px;
+    display: inline-block;
+    text-align: center;
+    padding: 0 5px;
+}
+.table-orders span.col-number {
+    width: 55px;
+    display: inline-block;
+    text-align: center;
+    padding: 0 5px;
+}
+.table-orders span.col-cost {
+    width: 215px;
+    display: inline-block;
+    text-align: center;
+    padding: 0 5px;
+}
+.table-orders-head span {
+	font-weight: bold;
+}
+.table-orders-row {
+	margin-top: 10px;
+	padding: 5px 0 5px;
+	border-bottom: 1px solid #DAE1E8;
+}
+.table-orders-row span {
+    font-size: 14px;
+}
+.table-orders-row span.col-cost {
+    font-size: 16px;
+}
+.table-orders-row span.col-date div.date-time {
+    font-size: 12px;
+}
+.table-orders-row span.cost-penny {
+    font-size: 12px;
+}
+.scrollable .scroll-wait {
+   display: none;
+   text-align: center;
+   margin: 20px 0px;
+}

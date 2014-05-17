@@ -3,11 +3,11 @@
 ini_set('display_errors', 1);
 require_once realpath(__DIR__ . '/../app/app.inc.php');
 
-for ($i = 0; $i < 10; $i ++) {
+for ($i = 0; $i < 100; $i ++) {
     $user = User::create(array(
         'email' => 'email' . $i . '@gmail.com',
     ));
-    Transaction::refillTransaction($user, mt_rand(1, 20000));
+    Transaction::refillTransaction($user, mt_rand(1, 100000));
     for ($j = 0; $j < 10; $j ++) {
         if ($user->data['balance'] < 1) {
             break;

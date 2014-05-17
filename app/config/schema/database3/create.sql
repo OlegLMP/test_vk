@@ -73,7 +73,7 @@ CREATE TABLE `bookkeeping_account` (
 
 DROP TABLE IF EXISTS `bookkeeping_account_entry`;
 CREATE TABLE `bookkeeping_account_entry` (
-  `id` TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `bookkeeping_account` TINYINT UNSIGNED NOT NULL COMMENT "->bookkeeping_account.id Бухгалтерский счёт",
   `amount` DECIMAL(18,2) NOT NULL COMMENT "Сумма|Сумма проводки",
   `class` VARCHAR(25) COMMENT "Класс модели, с которым связана проводка",

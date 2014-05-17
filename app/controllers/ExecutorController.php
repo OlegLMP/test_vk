@@ -1,6 +1,7 @@
 <?php
 class ExecutorController extends ControllerBase
 {
+    const ORDERS_SHOW_LIMIT = 50;
 
     /**
      * Работа до вызова Action метода
@@ -26,7 +27,63 @@ class ExecutorController extends ControllerBase
      */
     public function indexAction($uri)
     {
-        $this->renderView($this->_getParams());
+        $sortBy = 'created';
+        $sortDirection = 'ASC';
+        $db = Db::get(Order::$dbConfigSection);
+        $orders = $db->sql('SELECT id, created, executor_fee FROM ' . Db::name(Order::getTableName()) . '
+WHERE status=' . OrderStatus::ID_NEW . '
+ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection . ' LIMIT ' . self::ORDERS_SHOW_LIMIT);
+        $this->renderView($this->_getParams() + array(
+            'orders'        => $orders,
+            'sortBy'        => $sortBy,
+            'sortDirection' => $sortDirection,
+        ));
+    }
+
+    /**
+     * AJAX запрос на получение очередной порции заказов
+     *
+     * @author oleg
+     * @return void
+     */
+    public function updateAction($uri)
+    {
+        $this->isAjax = true;
+        $sortBy = (isset($_POST['sortBy']) && $_POST['sortBy'] == 'executor_fee') ? 'executor_fee' : 'created';
+        $sortDirection = (isset($_POST['sortDirection']) && $_POST['sortDirection'] == 'DESC') ? 'DESC' : 'ASC';
+        $lastData = (isset($_POST['lastData']) && strlen($_POST['lastData']) ? mb_substr($_POST['lastData'], 0, 255) : null);
+        $lastId = (isset($_POST['lastId']) && strlen($_POST['lastId']) ? floor($_POST['lastId']) : 0);
+        $db = Db::get(Order::$dbConfigSection);
+        $orders = array();
+        if ($lastData) {
+            $orders = $db->sql('SELECT id, created, executor_fee FROM ' . Db::name(Order::getTableName()) . '
+WHERE status=' . OrderStatus::ID_NEW . '
+&& ' . Db::name($sortBy) . ' = ' . $db->prepare($lastData) . '
+&& id' . ($sortDirection == 'ASC' ? '>' : '<') . $db->prepare($lastId) . '
+ORDER BY id ' . $sortDirection . ' LIMIT ' . self::ORDERS_SHOW_LIMIT);
+        }
+        if (count($orders) < self::ORDERS_SHOW_LIMIT) {
+            $orders = array_merge($orders, $db->sql('SELECT id, created, executor_fee FROM ' . Db::name(Order::getTableName()) . '
+WHERE status=' . OrderStatus::ID_NEW . '
+' . (isset($lastData) ? '&& ' . Db::name($sortBy) . ($sortDirection == 'ASC' ? '>' : '<') . $db->prepare($lastData) : '') . '
+ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection . ' LIMIT ' . (self::ORDERS_SHOW_LIMIT - count($orders))));
+        }
+        if (! $orders) {
+            echo json_encode(array('status' => 'noRecords'));
+            return;
+        }
+        ob_start();
+        foreach ($orders as $order) {
+            $this->renderView(array('order' => $order), '/executor/partial/order');
+        }
+        $html = ob_get_clean();
+        ob_end_clean();
+        echo json_encode(array(
+            'status'   => 'ok',
+            'html'     => $html,
+            'lastData' => $order[$sortBy],
+            'lastId'   => $order['id'],
+        ));
     }
 
     /**

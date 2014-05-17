@@ -15,11 +15,10 @@ CREATE TABLE `order` (
  `created` TIMESTAMP NOT NULL DEFAULT "0000-00-00 00:00:00" COMMENT "Создан",
  `updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Изменён",
  PRIMARY KEY (`id`),
- KEY status_idx (`status`),
- KEY customer_idx (`customer`),
- KEY executor_idx (`executor`),
- KEY executor_fee_idx (`executor_fee`),
- KEY created_idx (`created`)
+ KEY customer_status_idx (`customer`, `status`),
+ KEY executor_status_idx (`executor`, `status`),
+ KEY status_executor_fee__id_idx (`status`, `executor_fee`, `id`),
+ KEY status_created_id_idx (`status`, `created`, `id`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `order_status`;

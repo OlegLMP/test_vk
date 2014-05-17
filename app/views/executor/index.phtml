@@ -14,3 +14,33 @@
     </div>
 </div>
 <div class="clear"></div>
+
+<div class="table-orders-container">
+<?php if ($params['orders']): ?>
+<div class="table-orders-message">Нажмите на ссылку "Выполнить" напротив заказа, чтобы выполнить этот заказ. Вы моментально получите стоимость заказа на Ваш счёт в системе.</div>
+<span class="table-sort-options">Сортировать по:
+    <span class="sort-option<?php echo $params['sortBy'] == 'created' ? ' active ' . $params['sortDirection'] : ''; ?>" sortBy="created"><a href='#'>Дате</a></span>
+    <span class="sort-option<?php echo $params['sortBy'] == 'executor_fee' ? ' active ' . $params['sortDirection'] : ''; ?>" sortBy="executor_fee" firstSortDirection="DESC"><a href='#'>Стоимости</a></span>
+</span>
+<div class="table-orders scrollable">
+    <div class="table-orders-head">
+        <span class="col-number">Номер</span>
+        <span class="col-date">Дата</span>
+        <span class="col-cost">Стоимость</span>
+    </div>
+    <div class="table-orders-body">
+        <?php foreach ($params['orders'] as $order): ?>
+            <?php $controller->renderView(array('order' => $order), '/executor/partial/order'); ?>
+        <?php endforeach; ?>
+    </div>
+    <div class="scroll-wait"><img src="/img/css/upload_inv_mono.gif"></div>
+</div>
+<script>
+$(function(){
+	new Scroller($(".table-orders-container"), "/executor/update", "<?php echo $params['sortBy']; ?>", "<?php echo $params['sortDirection'] ?>", "<?php echo $order[$params['sortBy']]; ?>", <?php echo $order['id']; ?>);
+});
+</script
+<?php else: ?>
+<div class="table-orders-message">К сожалению, сейчас нет заказов, доступных для выполнения.</div>
+<?php endif; ?>
+</div>

@@ -1,0 +1,6 @@
+<div class="table-orders-row">
+    <span class="col-number"><?php echo $params['order']['id']; ?></span>
+    <span class="col-date"><div class="date-day"><?php echo substr($params['order']['created'], 0, 10); ?></div><div class="date-time"><?php echo substr($params['order']['created'], 10); ?></div></span>
+    <span class="col-cost"><?php echo mb_substr($sum = F::formatMoney($params['order']['executor_fee']), 0, -8); ?> <span class="cost-penny"><?php echo mb_substr($sum, -7); ?></span></span>
+    <span class="col-action"><a href="#dialog" name="modal" url="/executor/execorder/<?php echo $params['order']['id']; ?>">Выполнить</a></span>
+</div>

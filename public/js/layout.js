@@ -112,5 +112,82 @@ function MainLayout()
     };
 }
 
+function Scroller(container, updateUrl, sortBy, sortDirection, lastData, lastId)
+{
+	this.container = $(container);
+	this.updateUrl = updateUrl;
+	this.sortBy = sortBy;
+	this.sortDirection = sortDirection;
+	this.lastData = lastData;
+	this.lastId = lastId;
+	this.busy = 0;
+	this.noRecords = 0;
+	this.loadHeight = 900;
+	
+    this.init = function() {
+        this.handle();
+        this.handleSortOptions();
+    };
+    
+    this.handle = function()
+    {
+    	var scroller = this;
+        $(document).scroll(function () {
+        	scroller.update();
+        });
+    };
+    
+    this.update = function()
+    {
+    	var scroller = this;
+    	if (this.busy || this.noRecords 
+    			|| $(document).scrollTop() + $(window).height() < $(document).height() - this.loadHeight) {
+    		return;
+    	}
+    	this.busy = 1;
+    	this.container.find(".scroll-wait").show();
+	    $.post(this.updateUrl, { sortBy: this.sortBy, sortDirection: this.sortDirection, lastData: this.lastData, lastId: this.lastId} ,
+    	        function(data) {
+	    			scroller.container.find(".scroll-wait").hide();
+    	            if (data.status == 'ok') {
+    	            	scroller.lastData = data.lastData;
+    	            	scroller.lastId = data.lastId;
+    	            	scroller.container.find(".table-orders-body").append(data.html);
+    	            }
+    	            if (data.status == 'noRecords') {
+    	            	scroller.noRecords = 1;
+    	            }
+    	            scroller.busy = 0;
+    	        }, "json");
+    };
+    
+    this.handleSortOptions = function()
+    {
+    	var scroller = this;
+    	scroller.container.find('.sort-option').click(function(event) {
+    		event.preventDefault();
+    		element = $(event.target).parent();
+    		if (element.hasClass('active')) {
+    			element.removeClass(scroller.sortDirection);
+    			scroller.sortDirection = (scroller.sortDirection == 'ASC' ? 'DESC' : 'ASC');
+    			element.addClass(scroller.sortDirection);
+    		} else {
+    			scroller.container.find('.sort-option.active').removeClass('active ASC DESC');
+    			scroller.sortDirection = element.attr('firstSortDirection') ? element.attr('firstSortDirection') : 'ASC';
+    			scroller.sortBy = element.attr('sortBy');
+    			element.addClass('active ' + scroller.sortDirection);
+    		}
+    		scroller.lastData = '';
+    		scroller.lastId = '';
+    		scroller.noRecords = 0;
+    		scroller.busy = 0;
+    		scroller.container.find(".table-orders-body").empty();
+    		scroller.update();
+        });
+    };
+    
+    this.init();
+}
+
 var ML = new MainLayout();
 
