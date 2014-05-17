@@ -98,6 +98,10 @@ class Transaction extends ActiveRecord
         if ($user->data['balance'] < $amount) {
             throw new AppException('Недостаточно средств на балансе заказчика');
         }
+        $commission = round($amount / 100 * Config::get('settings.commission'), 2);
+        if ($commission < 0 || $commission > $amount) {
+            throw new AppException('Коммиссия системы не может быть меньше 0 или больше стоимости заказа');
+        }
 
         // Открытие транзакции
         $transaction = self::create(array(
@@ -140,8 +144,10 @@ class Transaction extends ActiveRecord
 
         // 4) Создаём заказ
         $order = $transaction->_create('Order', array(
-            'customer'   => $user->key,
-            'total_cost' => $amount,
+            'customer'     => $user->key,
+            'total_cost'   => $amount,
+            'commission'   => $commission,
+            'executor_fee' => $amount - $commission,
         ), $amount);
 
         // 5) Заносим проводку по бухгалтерскому счёту "Фонд оплаты заказов"

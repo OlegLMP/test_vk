@@ -1,10 +1,6 @@
 <?php
-class CustomerController extends ControllerBase
+class ExecutorController extends ControllerBase
 {
-    const RESTRICT_REFILL_MIN = 1;
-    const RESTRICT_REFILL_MAX = 100000;
-    const RESTRICT_ORDER_COST_MIN = 1;
-    const RESTRICT_ORDER_COST_MAX = 100000;
 
     /**
      * Работа до вызова Action метода
@@ -16,14 +12,14 @@ class CustomerController extends ControllerBase
     public function before($actionMethod)
     {
         parent::before($actionMethod);
-        if (! ($user = $this->getLoginedUser()) || $user->data['role'] != UserRole::ID_CUSTOMER) {
+        if (! ($user = $this->getLoginedUser()) || $user->data['role'] != UserRole::ID_EXECUTOR) {
             $this->redirect('/');
             exit();
         }
     }
 
     /**
-     * Главная страница кабинета заказчика
+     * Главная страница кабинета исполнителя
      *
      * @author oleg
      * @return void
@@ -34,7 +30,7 @@ class CustomerController extends ControllerBase
     }
 
     /**
-     * подготовка данных для кабинета заказчика
+     * подготовка данных для кабинета исполнителя
      *
      * @author oleg
      * @return array
@@ -42,17 +38,12 @@ class CustomerController extends ControllerBase
     private function _getParams()
     {
         $db = Db::get(Order::$dbConfigSection);
-        $ordersInWork = $db->sql('SELECT count(*) FROM ' . Db::name('order') . '
-WHERE customer=' . $db->prepare($this->getLoginedUser()->key) . '
-&&status=' . OrderStatus::ID_NEW . '
-LIMIT 1', PDO::FETCH_COLUMN);
         $ordersExecuted = $db->sql('SELECT count(*) FROM ' . Db::name('order') . '
-WHERE customer=' . $db->prepare($this->getLoginedUser()->key) . '
+WHERE executor=' . $db->prepare($this->getLoginedUser()->key) . '
 &&status=' . OrderStatus::ID_EXECUTED . '
 LIMIT 1', PDO::FETCH_COLUMN);
         return array(
             'loginedUser'  => $this->getLoginedUser(),
-            'ordersInWork' => $ordersInWork,
             'ordersExecuted' => $ordersExecuted,
         );
     }

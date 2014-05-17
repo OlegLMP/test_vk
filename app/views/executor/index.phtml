@@ -1,0 +1,16 @@
+<div class="indexpage-title">Кабинет исполнителя</div>
+<div class="balance-container">
+    <div class="balance-title">У Вас на счету</div>
+    <div class="balance-sum">
+        <img class="balance-img" src="/img/ico/wallet-32x32.png">
+        <?php echo F::formatMoney($params['loginedUser']->data['balance']); ?>
+    </div>
+</div>
+
+<div class="executor-right-panel">
+    <div class="executor-orders-container">
+        <div class="executor-order-title">Ваши заказы</div>
+        Вы выполнили <span class="executor-order-count"><?php echo $params['ordersExecuted']; ?></span> заказов
+    </div>
+</div>
+<div class="clear"></div>

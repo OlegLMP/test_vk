@@ -52,6 +52,7 @@ div.logo {
     padding-left: 70px;
     float: left;
     font-size: 32px;
+    color: #2B587A;
 }
 .clear {
   float: none;
@@ -211,7 +212,7 @@ div.balance-container {
     float: left;
     margin-left: 20px;
 }
-div.customer-right-panel {
+.customer-right-panel, .executor-right-panel {
     float: right;
     text-align: right;
 }
@@ -219,20 +220,20 @@ div.customer-right-panel {
     float: left;
     margin-top: 20px;
 }
-.customer-order-title {
+.customer-order-title, .executor-order-title {
     font-weight: bold;
 }
-.customer-order-count {
+.customer-order-count, .executor-order-count {
 	font-size: 14px;
     font-weight: bold;
 }
-.customer-step4 {
-    float: left;
-    margin-left: 150px;
+.background-step4 {
+	background: url('/img/step4.jpg') no-repeat top;
+	min-height: 352px;
 }
 .customer-register-executor {
     margin-top: 250px;
-    width: 300px;
+    width: 250px;
 }
 .bottom-links {
     text-align: right;
