@@ -13,7 +13,7 @@ class Db {
      *
      * @var Db[]
      */
-    private static $_instances;
+    public static $_instances;
 
     /**
      * Секция конфига с параметрами подключения к базе
@@ -27,7 +27,7 @@ class Db {
      *
      * @var PDO
      */
-    private $_pdo;
+    public $_pdo;
 
     /**
      * Последний запрос к базе
@@ -53,7 +53,7 @@ class Db {
      *
      * @author oleg
      * @param string $configSection - секция конфига с параметрами подключения к базе
-     * @return void
+     * @return Db
      */
     public static function get($configSection)
     {
@@ -195,7 +195,7 @@ class Db {
         if (is_bool($value)) {
             return (int) $value;
         }
-        if (is_int($value) || is_float($value)) {
+        if (is_numeric($value)) {
             return $value;
         }
         $this->connect();

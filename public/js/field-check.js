@@ -61,7 +61,7 @@ function FieldCheck(params)
         }).click(function () {
         	calc.applyFilter(2000);
         });
-    }
+    };
 
     this.parseParams = function(params)
     {
@@ -117,7 +117,7 @@ function FieldCheck(params)
     				.attr('title', message))
     		.append($('<span class="fieldCheckStatusText"></span>')
     				.text(message));
-    }
+    };
 
     this.doApplyFilter = function(calc)
     {
@@ -179,6 +179,23 @@ function FieldCheck(params)
            					case 'regExp':
         						if (val.search(new RegExp(params[k][2])) == -1) {
         							this.onResult({result : false, message : 'Содержатся недопустимые символы'});
+        							this.lastVal = ''; //Сбрасываем кэш
+        							return;
+        						}
+        						break;
+           					case 'between':
+        						if (isNaN(val)) {
+        							this.onResult({result : false, message : 'Введите число'});
+        							this.lastVal = ''; //Сбрасываем кэш
+        							return;
+        						}
+        						if (typeof params[k][2] == 'number' && val < params[k][2]) {
+        							this.onResult({result : false, message : 'Минимум - ' + params[k][2]});
+        							this.lastVal = ''; //Сбрасываем кэш
+        							return;
+        						}
+        						if (typeof params[k][3] == 'number' && val > params[k][3]) {
+        							this.onResult({result : false, message : 'Максимум - ' + params[k][3]});
         							this.lastVal = ''; //Сбрасываем кэш
         							return;
         						}

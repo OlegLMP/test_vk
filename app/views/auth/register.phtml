@@ -6,7 +6,7 @@
         В целях корректной обработки платежей, используйте настоящие имя и фамилию.
     </div>
 </div>
-<form id="reg-form" action="/auth/register2">
+<form id="form" action="/auth/register2">
 <div class="input-label">Ваше имя</div>
 <div class="input-field">
     <label for="first_name">Введите имя</label>
@@ -37,33 +37,5 @@
 </form>
 
 <script>
-FieldCheck.initAll();
-$("#reg-form").submit(function( event ) {
-    event.preventDefault();
-    var form = $( this );
-    form.find('.button-text').hide();
-    form.find('.button-wait').show();
-    $.post(form.attr( "action" ), form.serialize(),
-        function(data) {
-            if (data.status == 'error') {
-                form.find('.button-wait').hide();
-                form.find('.button-text').show();
-                if (typeof data.hash != 'undefined') {
-                    form.find('input[name="hash"]').val(data.hash);
-                }
-                $(".dialogMessage").html(data.message);
-                $(".dialogMessageBorder").css("width", $(".dialogMessage").css("width")).css("height", $(".dialogMessage").css("height"));
-                $(".dialogMessageBorder").fadeTo(0, 1).fadeTo(600, 0);
-            }
-            if (data.status == 'ok') {
-            	$(".dialogMessage").html(data.message);
-            	form.attr("action", data.action);
-            	form.html(data.content);
-            	FieldCheck.initAll();
-            }
-            if (data.status == 'redirect') {
-                document.location = data.url;
-            }
-        }, "json");
-});
+ML.dialogLoaded($("#form"));
 </script>

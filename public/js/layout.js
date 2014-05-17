@@ -66,3 +66,51 @@ $(document).ready(function() {
 	
 });
 
+function MainLayout()
+{
+    this.setFocus = function(container) {
+    	if (typeof container == 'undefined') {
+    		container = document;
+    	}
+        $(container).find("input.fieldCheck.fieldError").first().focus().length
+        	|| $(container).find("input").first().focus();
+    };
+    
+    this.dialogLoaded = function(container) {
+    	FieldCheck.initAll();
+    	this.setFocus(container);
+    	$(container).submit(function(event) {
+    	    event.preventDefault();
+    	    var form = $(event.target);
+    	    form.find('.button-text').hide();
+    	    form.find('.button-wait').show();
+    	    $.post(form.attr("action"), form.serialize(),
+    	        function(data) {
+    	            if (data.status == 'error') {
+    	                form.find('.button-wait').hide();
+    	                form.find('.button-text').show();
+    	                if (typeof data.hash != 'undefined') {
+    	                    form.find('input[name="hash"]').val(data.hash);
+    	                }
+    	                $(".dialogMessage").html(data.message);
+    	                $(".dialogMessageBorder").css("width", $(".dialogMessage").css("width")).css("height", $(".dialogMessage").css("height"));
+    	                $(".dialogMessageBorder").fadeTo(0, 1).fadeTo(600, 0);
+    	                ML.setFocus(form);
+    	            }
+    	            if (data.status == 'ok') {
+    	            	$(".dialogMessage").html(data.message);
+    	            	form.attr("action", data.action);
+    	            	form.html(data.content);
+    	            	FieldCheck.initAll();
+    	            	ML.setFocus(form);
+    	            }
+    	            if (data.status == 'redirect') {
+    	                document.location = data.url;
+    	            }
+    	        }, "json");
+    	});
+    };
+}
+
+var ML = new MainLayout();
+

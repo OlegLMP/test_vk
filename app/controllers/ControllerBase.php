@@ -30,6 +30,13 @@ abstract class ControllerBase
     public $isAjax = false;
 
     /**
+     * Авторизованный пользователь
+     *
+     * @var User
+     */
+    public $loginedUser;
+
+    /**
      * Конструктор
      *
      * @author oleg
@@ -71,9 +78,12 @@ abstract class ControllerBase
     {
         if (! $this->isAjax) {
             $content = ob_get_clean();
-            $this->renderView('_layout/top', array('jsScripts' => $this->jsScripts));
+            $this->renderView(array(
+                'jsScripts'   => $this->jsScripts,
+                'loginedUser' => $this->getLoginedUser(),
+            ), '_layout/top');
             echo $content;
-            $this->renderView('_layout/bottom');
+            $this->renderView(null, '_layout/bottom');
         }
     }
 
@@ -81,11 +91,11 @@ abstract class ControllerBase
      * Вывод представления (вьюшки)
      *
      * @author oleg
-     * @param string $path - путь/название. Если не задан, берётся controller/action
      * @param array $params - параметры для отображения
+     * @param string $path - путь/название. Если не задан, берётся controller/action
      * @return void
      */
-    public function renderView($path = null, $params = array())
+    public function renderView($params = null, $path = null)
     {
         if (! isset($path)) {
             $path = $this->urls['action'];
@@ -154,6 +164,39 @@ abstract class ControllerBase
         $link = $scheme . '://' . $_SERVER['HTTP_HOST'] . (strpos($url, '/') === 0 ? '' : '/') . $url;
         header('Location: ' . $link);
         exit();
+    }
+
+    /**
+     * Проверяет, авторизован ли пользователь
+     *
+     * @author oleg
+     * @return int | null - id авторизованного пользователя либо null, если пользователь не авторизован
+     */
+    public static function getLoginedUserKey()
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        return ! empty($_SESSION['logined']) ? $_SESSION['logined'] : null;
+    }
+
+    /**
+     * Возвращает модель авторизованного пользователя
+     *
+     * @author oleg
+     * @return User | false
+     */
+    public function getLoginedUser()
+    {
+        if (! $key = $this->getLoginedUserKey()) {
+            return null;
+        }
+        if (! isset($this->loginedUser)) {
+            if (! $this->loginedUser = User::find($key)) {
+                AuthController::logout();
+            }
+        }
+        return $this->loginedUser;
     }
 
 }

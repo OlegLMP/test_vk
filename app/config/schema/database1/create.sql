@@ -11,6 +11,8 @@ CREATE TABLE `user` (
  `first_name` VARCHAR(255) NOT NULL COMMENT "Имя",
  `last_name` VARCHAR(255) NOT NULL COMMENT "Фамилия",
  `password_hash` VARCHAR(255) COMMENT "Хэш пароля, он же соль",
+ `balance` DECIMAL(18,2) NOT NULL COMMENT "Баланс|Сумма на счету пользователя в системе",
+ `locked` TINYINT UNSIGNED NOT NULL COMMENT "Флаг блокировки для транзакций",
  `created` TIMESTAMP NOT NULL DEFAULT "0000-00-00 00:00:00" COMMENT "Создан",
  `updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Изменён",
  PRIMARY KEY (`id`),

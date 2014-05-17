@@ -10,7 +10,7 @@ abstract class ActiveRecord
      * Ключевое поле
      * Может переопределяться в потомках
      *
-     * @var int|string
+     * @var string
      */
     public static $keyField = 'id';
 
@@ -200,6 +200,22 @@ abstract class ActiveRecord
     }
 
     /**
+     * Перечитывает данные из базы
+     *
+     * @author olegb
+     * @return ActiveRecord
+     */
+    public function reload()
+    {
+        if (! isset($this->key)) {
+            return;
+        }
+        $result = static::readData($this->key);
+        static::fromArray($result);
+        return $this;
+    }
+
+    /**
      * Получение мени таблицы, в которой хранятся объекты данного типа
      *
      * @author olegb
@@ -284,10 +300,11 @@ abstract class ActiveRecord
     public function insertLog($setSql)
     {
         if (static::$log && Db::get(static::$dbConfigSection)->getAffectedRows()) {
-            Db::get(static::$dbConfigSection)->sql('INSERT log SET initiator=' . Db::get(static::$dbConfigSection)->prepare(Initiator::createInitiatorKey()) . ',
-class=' . Db::get(static::$dbConfigSection)->prepare(get_called_class()) . ',
-model=' . Db::get(static::$dbConfigSection)->prepare($this->key) . ',
-data=' . Db::get(static::$dbConfigSection)->prepare($setSql));
+            $db = Db::get(Log::$dbConfigSection);
+            $db->sql('INSERT log SET initiator=' . Db::get(static::$dbConfigSection)->prepare(Initiator::createInitiatorKey()) . ',
+class=' . $db->prepare(get_called_class()) . ',
+model=' . $db->prepare($this->key) . ',
+data=' . $db->prepare($setSql));
         }
     }
 

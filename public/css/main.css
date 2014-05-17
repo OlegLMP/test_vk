@@ -194,3 +194,35 @@ div.logo {
 .indexpage-step1 {
     float: right;
 }
+div.balance-title {
+	font-weight: bold;
+}
+.balance-sum {
+	font-size: 14px;
+	font-weight: bold;
+}
+.balance-links {
+	font-size: 13px;
+}
+div.balance-container {
+    float: left;
+}
+.customer-step2 {
+    float: left;
+    margin-left: 20px;
+}
+div.customer-right-panel {
+    float: right;
+    text-align: right;
+}
+.customer-step3 {
+    float: left;
+    margin-top: 20px;
+}
+.customer-order-title {
+    font-weight: bold;
+}
+.customer-order-count {
+	font-size: 14px;
+    font-weight: bold;
+}

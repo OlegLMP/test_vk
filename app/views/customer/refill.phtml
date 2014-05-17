@@ -1,0 +1,28 @@
+<div class="dialogTitle">Пополнение счёта</div>
+<div class="dialogMessageBox">
+    <div class="dialogMessageBorder"></div>
+    <div class="dialogMessage">
+        <b>Пожалуйста, введите сумму, которую вы желаете внести на Ваш счёт.</b><br/>
+        Пополнение счёта производится моментально. Ваши личные данные никому не будут переданы.
+    </div>
+</div>
+<form id="form" action="/customer/refill2">
+<div class="input-label">Сумма пополнения</div>
+<div class="input-field">
+    <label for="amount">Введите сумму</label>
+    <input type="text" name="amount" id="amount" value="" class="fieldCheck"
+        params='<?php echo json_encode(array(array('local', 'between', CustomerController::RESTRICT_REFILL_MIN, CustomerController::RESTRICT_REFILL_MAX))); ?>' />
+</div>
+<div class="clear"></div>
+<?php echo ControllerBase::getCsrfProtection(); ?>
+<div class="input-button">
+<button>
+    <span class="button-text">Пополнить</span>
+    <span class="button-wait"><img src="/img/css/upload_inv_mono.gif"></span>
+</button>
+</div>
+</form>
+
+<script>
+ML.dialogLoaded($("#form"));
+</script>

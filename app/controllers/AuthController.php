@@ -197,7 +197,7 @@ class AuthController extends ControllerBase
             $this->redirect('/?wrong_hash=1');
             return;
         }
-        $this->_logout();
+        $this->logout();
         $this->redirect('/');
     }
 
@@ -246,7 +246,7 @@ class AuthController extends ControllerBase
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        $_SESSION['logined'] = $user->data;
+        $_SESSION['logined'] = $user->key;
     }
 
     /**
@@ -255,44 +255,12 @@ class AuthController extends ControllerBase
      * @author oleg
      * @return void
      */
-    private function _logout()
+    public function logout()
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
         $_SESSION['logined'] = null;
-    }
-
-    /**
-     * Проверяет, авторизован ли пользователь
-     *
-     * @author oleg
-     * @return bool
-     */
-    public static function isLogined()
-    {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-        return ! empty($_SESSION['logined']);
-    }
-
-    /**
-     * Возвращает данные авторизованного пользователя
-     *
-     * @author oleg
-     * @return array | null
-     */
-    public static function getLoginedUser()
-    {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-        if (empty($_SESSION['logined'])) {
-            return null;
-        } else {
-            return $_SESSION['logined'];
-        }
     }
 
 }

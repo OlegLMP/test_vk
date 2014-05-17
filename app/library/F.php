@@ -217,4 +217,16 @@ class F
         return htmlspecialchars($text);
     }
 
+    /**
+     * Вывести сумму в читаемом формате
+     *
+     * @author oleg
+     * @param string $amount - сумма
+     * @return string
+     */
+    public static function formatMoney($amount, $currency = 'руб.', $penny = 'коп.')
+    {
+        return number_format($amount, 2, ' ' . $currency . ' ', ' ') . ' ' . $penny;
+    }
+
 }

@@ -1,3 +1,26 @@
 <div class="indexpage-title">Кабинет заказчика</div>
-
+<div class="balance-container">
+    <div class="balance-title">У Вас на счету</div>
+    <div class="balance-sum">
+        <img class="balance-img" src="/img/ico/wallet-32x32.png">
+        <?php echo F::formatMoney($params['loginedUser']->data['balance']); ?>
+    </div>
+    <div class="balance-links">
+        <a href="#dialog" name="modal" url="/customer/refill">Пополнить</a>
+    </div>
+</div>
+<div class="customer-step2">
+    <img src="/img/step2.jpg">
+</div>
+<div class="customer-right-panel">
+    <div class="customer-orders-container">
+        <div class="customer-order-title">Ваши заказы</div>
+        В работе <span class="customer-order-count"><?php echo $params['ordersInWork']; ?></span>
+        Завершенных <span class="customer-order-count"><?php echo $params['ordersExecuted']; ?></span>
+        <div class="balance-links"><a href="/customer/neworder">Разместить заказ</a></div>
+    </div>
+    <div class="customer-step3">
+        <img src="/img/step3.jpg">
+    </div>
+</div>
 <div class="clear"></div>

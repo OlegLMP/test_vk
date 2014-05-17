@@ -27,8 +27,8 @@ class Initiator extends ActiveRecord
     public static function createInitiatorKey()
     {
         $createData = array();
-        if ($user = false) { // TODO
-            $createData['user'] = 1;
+        if (PHP_SAPI != 'cli' && $userKey = ControllerBase::getLoginedUserKey()) {
+            $createData['user'] = $userKey;
         }
         $createData['ip'] = strval(F::getIp());
         $systemUser = '';
