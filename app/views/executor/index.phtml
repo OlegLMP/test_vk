@@ -39,7 +39,7 @@
 $(function(){
 	new Scroller($(".table-orders-container"), "/executor/update", "<?php echo $params['sortBy']; ?>", "<?php echo $params['sortDirection'] ?>", "<?php echo $order[$params['sortBy']]; ?>", <?php echo $order['id']; ?>);
 	$(document).on('click', '.table-orders-row .col-action a', function(event){
-		   $(event.target).parent().parent().remove();
+		   $(event.target).parents('.table-orders-row').remove();
 	});
 });
 </script

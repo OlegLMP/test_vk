@@ -1,5 +1,7 @@
 <?php
 
+ini_set('display_errors', 0);
+
 define('SCRIPT_START_TIME', microtime(true));
 
 define('APPLICATION_ROOT', realpath(__DIR__ . '/../'));
@@ -25,6 +27,7 @@ spl_autoload_register(function ($class) {
 Config::read(APPLICATION_ROOT . '/app/config/config.ini');
 
 if (Config::get('settings.debug')) {
+    ini_set('display_errors', 1);
     Debuger::message('Started');
 }
 

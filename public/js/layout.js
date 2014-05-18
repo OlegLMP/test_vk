@@ -1,71 +1,3 @@
-$(document).ready(function() {	
-	
-	//select all the a tag with name equal to modal
-	$(document).on('click', 'a[name=modal],button[name=modal]', function(e) {
-		//Cancel the link behavior
-		e.preventDefault();
-		//Get the A tag
-		var id = $(this).attr('href');
-		
-		var url = $(this).attr('url');
-		var container = $(id + ' .dialogContainer');
-		if (typeof url != 'undefined' && container.length) {
-			container.html('<div class="loading"></div>');
-			container.load(url);
-		}
-	
-		//Get the screen height and width
-		var maskHeight = $(document).height();
-		var maskWidth = $(window).width();
-	
-		//Set height and width to mask to fill up the whole screen
-		$('#mask').css({'width':maskWidth,'height':maskHeight});
-		
-		//transition effect		
-		$('#mask').fadeTo(0, 0.5);
-		//$('#mask').fadeIn(0);	
-		
-	
-		//Get the window height and width
-		var winH = $(window).height();
-		var winW = $(window).width();
-              
-		//Set the popup window to center
-		$(id).css('top',  winH/2-$(id).height()/2);
-		$(id).css('left', winW/2-$(id).width()/2);
-	
-		//transition effect
-		$(id).fadeIn(0); 
-	
-	});
-	
-	//if close button is clicked
-	$('.window').on('click', '.close', function (e) {
-		//Cancel the link behavior
-		e.preventDefault();
-		$('#mask, .window').hide();
-	});		
-	
-	//if mask is clicked
-	$('#mask').click(function () {
-		$(this).hide();
-		$('.window').hide();
-	});
-	
-	//placeholders
-	$(document).on('blur change DOMAutoComplete AutoComplete focus keydown keyup', "input[type='text'], input[type='password'], textarea, select",
-	    function(event) {
-			var label = $("label[for='" + $(this).attr('id') + "']");
-			if ($(this).val() == '' && event.type != 'keydown') {
-				label.fadeTo("fast", $(this).is(":focus") || event.type == 'focusin' ? 0.5 : 1);
-			} else {
-				label.css("display", "none");
-			}
-		}
-	);
-	
-});
-
 function MainLayout()
 {
     this.setFocus = function(container) {
@@ -188,6 +120,92 @@ function Scroller(container, updateUrl, sortBy, sortDirection, lastData, lastId)
     
     this.init();
 }
+
+$(document).ready(function() {	
+	
+	//select all the a tag with name equal to modal
+	$(document).on('click', 'a[name=modal],button[name=modal]', function(e) {
+		//Cancel the link behavior
+		e.preventDefault();
+		//Get the A tag
+		var id = $(this).attr('href');
+		
+		var url = $(this).attr('url');
+		var container = $(id + ' .dialogContainer');
+		if (typeof url != 'undefined' && container.length) {
+			container.html('<div class="loading"></div>');
+			container.load(url);
+		}
+	
+		//Get the screen height and width
+		var maskHeight = $(document).height();
+		var maskWidth = $(window).width();
+	
+		//Set height and width to mask to fill up the whole screen
+		$('#mask').css({'width':maskWidth,'height':maskHeight});
+		
+		//transition effect		
+		$('#mask').fadeTo(0, 0.5);
+		//$('#mask').fadeIn(0);	
+		
+	
+		//Get the window height and width
+		var winH = $(window).height();
+		var winW = $(window).width();
+              
+		//Set the popup window to center
+		$(id).css('top',  winH/2-$(id).height()/2);
+		$(id).css('left', winW/2-$(id).width()/2);
+	
+		//transition effect
+		$(id).fadeIn(0); 
+	
+	});
+	
+	//if close button is clicked
+	$('.window').on('click', '.close', function (e) {
+		//Cancel the link behavior
+		e.preventDefault();
+		$('#mask, .window').hide();
+	});		
+	
+	//if mask is clicked
+	/*$('#mask').click(function () {
+		$(this).hide();
+		$('.window').hide();
+	});*/
+	
+	//placeholders
+	$(document).on('blur change DOMAutoComplete AutoComplete focus keydown keyup', "input[type='text'], input[type='password'], textarea, select",
+	    function(event) {
+			var label = $("label[for='" + $(this).attr('id') + "']");
+			if ($(this).val() == '' && event.type != 'keydown') {
+				label.fadeTo("fast", $(this).is(":focus") || event.type == 'focusin' ? 0.5 : 1);
+			} else {
+				label.css("display", "none");
+			}
+		}
+	);
+	
+	// Ссылка Наверх слева
+	$('.left-panel').click(function (){
+		$('body,html').animate({
+			scrollTop:0
+		}, 600);
+		return false;
+	});
+	$(window).resize(function(){
+		$('.left-panel').width(($(document).width() - 960) / 2);
+	});
+	$(window).resize();
+    $(document).scroll(function () {
+    	if ($(document).scrollTop() > 500) {
+    		$('.left-panel:not(:visible)').fadeIn(400);
+    	} else {
+    		$('.left-panel:visible').fadeOut(400);
+    	}
+    });
+});
 
 var ML = new MainLayout();
 

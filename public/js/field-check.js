@@ -37,7 +37,7 @@ function FieldCheck(params)
         			if (params[k][0] == 'local') {
         				switch(params[k][1]) {
         					case 'inputEquals':
-        						this.handle($($(this.input)[0].form).find('#' + params[k][2]));
+        						this.handle($($(this.input)[0].form).find('#' + params[k][2]), true);
         						break;
         				}
         			}
@@ -47,18 +47,30 @@ function FieldCheck(params)
 
     };
     
-    this.handle = function(element)
+    this.handle = function(element, checkIfFilledOnly)
     {
     	var calc = this;
+    	if (typeof checkIfFilledOnly =="undefined") {
+    		checkIfFilledOnly = false;
+    	}
         $(element).keyup(function (e) {
+        	if (checkIfFilledOnly && ! $(calc.input).val()) {
+        		return;
+        	}
             if (e.keyCode == 13) {
                 calc.doApplyFilter();
             } else {
                 calc.applyFilter();
             }
         }).change(function () {
+        	if (checkIfFilledOnly && ! $(calc.input).val()) {
+        		return;
+        	}
         	calc.applyFilter(200);
         }).click(function () {
+        	if (checkIfFilledOnly && ! $(calc.input).val()) {
+        		return;
+        	}
         	calc.applyFilter(2000);
         });
     };
@@ -158,7 +170,7 @@ function FieldCheck(params)
         					case 'inputEquals':
         						val2 = $($(this.input)[0].form).find('#' + params[k][2]).val();
         						cacheVal += ' / ' + val2;
-        						if (val != val2) {
+        						if (val2.length && val != val2) {
         							this.onResult({result : false, message : 'Введённые пароли не совпадают'});
         							this.lastVal = ''; //Сбрасываем кэш
         							return;
