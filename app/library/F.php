@@ -229,4 +229,37 @@ class F
         return number_format($amount, 2, ' ' . $currency . ' ', ' ') . ' ' . $penny;
     }
 
+    /**
+     * Вывести сумму в читаемом формате с выделением копеек меньшим шрифтом
+     *
+     * @author oleg
+     * @param string $amount - сумма
+     * @param string $class - класс для копеек
+     * @return string
+     */
+    public static function formatMoneyPenny($amount, $class = 'penny')
+    {
+        $money = number_format($amount, 2, '.', ' ');
+        return str_replace('.', '.<span class="' . $class . '">', $money) . '</span>';
+    }
+
+    /**
+     * Возвращает окончание в соответствии с правилами рус. яз.
+     * 1 заказ, 2 заказа, 5 заказов и т.д.
+     *
+     * @author oleg
+     * @param string $count
+     * @return string - окончание. Пустое, а, ов
+     */
+    public static function formatOrderNumberSuffix($count)
+    {
+        if (preg_match('~(^|[^1])1$~', $count)) {
+            return '';
+        }
+        if (preg_match('~(^|[^1])[2-4]$~', $count)) {
+            return 'а';
+        }
+        return 'ов';
+    }
+
 }

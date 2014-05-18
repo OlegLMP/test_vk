@@ -1,0 +1,5 @@
+<div class="report-row <?php echo $params['val1'] != $params['val2'] ? 'error' : 'ok' ?>">
+    <?php echo $params['name1']; ?> <span class="report-row-val"><?php echo F::formatMoneyPenny($params['val1']); ?></span>
+    <?php echo $params['val1'] != $params['val2'] ? 'НЕ' : '' ?> соответствует
+    <?php echo $params['name2']; ?> <span class="report-row-val"><?php echo F::formatMoneyPenny($params['val2']); ?></span>
+</div>

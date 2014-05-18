@@ -1,0 +1,64 @@
+<div class="indexpage-title">Бухгалтерская сводка</div>
+
+<table class="bookkeeping-table">
+    <tbody>
+        <tr class="s14">
+            <td class="th2">Актив</td>
+            <td rowspan="3" class="th2">Всего активов</td>
+            <td colspan="5" class="th4">Пассив</td>
+            <td rowspan="3" class="th4">Всего пассивов</td>
+        </tr>
+        <tr class="s12">
+            <td class="th2">Текущие активы</td>
+            <td colspan="3" class="th4">Текущие обязательства</td>
+            <td rowspan="2" class="th4">Всего обязательств</td>
+            <td class="th4">Капитал</td>
+        </tr>
+        <tr>
+            <td class="th3">Обязательства платежных систем</td>
+            <td class="th5">Счет заказчиков</td>
+            <td class="th5">Счет исполнителей</td>
+            <td class="th5">Фонд оплаты заказов</td>
+            <td class="th5">Прибыль</td>
+        </tr>
+        <tr>
+            <td class="td2"><?php echo F::formatMoneyPenny($params['balances'][0]); ?></td>
+            <td class="td3 s12"><?php echo F::formatMoneyPenny($params['summAsset']); ?></td>
+            <td class="td4"><?php echo F::formatMoneyPenny($params['balances'][1]); ?></td>
+            <td class="td4"><?php echo F::formatMoneyPenny($params['balances'][2]); ?></td>
+            <td class="td4"><?php echo F::formatMoneyPenny($params['balances'][3]); ?></td>
+            <td class="td4"><?php echo F::formatMoneyPenny($params['summObligations']); ?></td>
+            <td class="td4"><?php echo F::formatMoneyPenny($params['balances'][4]); ?></td>
+            <td class="td5 s12"><?php echo F::formatMoneyPenny($params['summLiabilities']); ?></td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="report-container">
+    <div class="report-row <?php echo $params['openTransactions'] > 0 ? 'error' : 'ok' ?>">Количество открытых транзакций: <?php echo $params['openTransactions']; ?></div>
+    <?php $controller->renderView(array(
+        'name1' => 'Сумма активов',
+        'val1' => $params['summAsset'],
+        'name2' => 'сумме пассивов',
+        'val2' => $params['summLiabilities']), '/index/partial/report-row'); ?>
+    <?php $controller->renderView(array(
+        'name1' => 'Счет заказчиков',
+        'val1' => $params['balances'][1],
+        'name2' => 'сумме балансов всех пользователей-заказчиков',
+        'val2' => $params['customerBalances']), '/index/partial/report-row'); ?>
+    <?php $controller->renderView(array(
+        'name1' => 'Счет исполнителей',
+        'val1' => $params['balances'][2],
+        'name2' => 'сумме балансов всех пользователей-исполнителей',
+        'val2' => $params['executorBalances']), '/index/partial/report-row'); ?>
+    <?php $controller->renderView(array(
+        'name1' => 'Фонд оплаты заказов',
+        'val1' => $params['balances'][3],
+        'name2' => 'сумме всех невыполненных заказов',
+        'val2' => $params['newOrdersSumm']), '/index/partial/report-row'); ?>
+    <?php $controller->renderView(array(
+        'name1' => 'Прибыль',
+        'val1' => $params['balances'][4],
+        'name2' => 'сумме комиссий всех выполненных заказов',
+        'val2' => $params['executedOrdersCommissionSumm']), '/index/partial/report-row'); ?>
+</div>

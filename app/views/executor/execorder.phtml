@@ -26,5 +26,6 @@ $(".balance-sum").text("<?php echo F::formatMoney($params['loginedUser']->data['
 <?php if (isset($params['ordersExecuted'])): ?>
 <script>
 $(".executor-order-count").text("<?php echo $params['ordersExecuted']; ?>");
+$(".executor-order-count-suffix").text("<?php echo F::formatOrderNumberSuffix($params['ordersExecuted']); ?>");
 </script>
 <?php endif; ?>

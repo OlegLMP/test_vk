@@ -29,7 +29,7 @@ class ExecutorController extends ControllerBase
     {
         $sortBy = 'created';
         $sortDirection = 'ASC';
-        $db = Db::get(Order::$dbConfigSection);
+        $db = Order::getDb();
         $orders = $db->sql('SELECT id, created, executor_fee FROM ' . Db::name(Order::getTableName()) . '
 WHERE status=' . OrderStatus::ID_NEW . '
 ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection . ' LIMIT ' . self::ORDERS_SHOW_LIMIT);
@@ -48,8 +48,8 @@ ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection
      */
     private function _getParams()
     {
-        $db = Db::get(Order::$dbConfigSection);
-        $ordersExecuted = $db->sql('SELECT count(*) FROM ' . Db::name('order') . '
+        $db = Order::getDb();
+        $ordersExecuted = $db->sql('SELECT count(*) FROM ' . Db::name(Order::getTableName()) . '
 WHERE executor=' . $db->prepare($this->getLoginedUser()->key) . '
 &&status=' . OrderStatus::ID_EXECUTED . '
 LIMIT 1', PDO::FETCH_COLUMN);
@@ -72,7 +72,7 @@ LIMIT 1', PDO::FETCH_COLUMN);
         $sortDirection = (isset($_POST['sortDirection']) && $_POST['sortDirection'] == 'DESC') ? 'DESC' : 'ASC';
         $lastData = (isset($_POST['lastData']) && strlen($_POST['lastData']) ? mb_substr($_POST['lastData'], 0, 255) : null);
         $lastId = (isset($_POST['lastId']) && strlen($_POST['lastId']) ? floor($_POST['lastId']) : 0);
-        $db = Db::get(Order::$dbConfigSection);
+        $db = Order::getDb();
         $orders = array();
         if ($lastData) {
             $orders = $db->sql('SELECT id, created, executor_fee FROM ' . Db::name(Order::getTableName()) . '

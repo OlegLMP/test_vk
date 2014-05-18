@@ -227,7 +227,7 @@ class AuthController extends ControllerBase
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        if (! is_array($_SESSION['reg_data'])) {
+        if (! isset($_SESSION['reg_data']) || ! is_array($_SESSION['reg_data'])) {
             $_SESSION['reg_data'] = array();
         }
         $_SESSION['reg_data'][$name] = $val;

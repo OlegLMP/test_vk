@@ -136,7 +136,7 @@ abstract class ActiveRecord
      */
     public static function findOneBy($name, $value)
     {
-        $result = Db::get(static::$dbConfigSection)->sql('SELECT * FROM ' . Db::name(static::getTableName()) . ' WHERE ' . Db::name($name) . ' = ' . Db::get(static::$dbConfigSection)->prepare($value) . ' LIMIT 1');
+        $result = static::getDb()->sql('SELECT * FROM ' . Db::name(static::getTableName()) . ' WHERE ' . Db::name($name) . ' = ' . static::getDb()->prepare($value) . ' LIMIT 1');
         return static::fromArray($result);
     }
 
@@ -153,9 +153,9 @@ abstract class ActiveRecord
     {
         $whereSql = '';
         foreach ($data as $name => $value) {
-            $whereSql .= ($whereSql ? ' && ' : '') . Db::name($name) . '=' . Db::get(static::$dbConfigSection)->prepare($value);
+            $whereSql .= ($whereSql ? ' && ' : '') . Db::name($name) . '=' . static::getDb()->prepare($value);
         }
-        $result = Db::get(static::$dbConfigSection)->sql('SELECT ' . ($returnKeyOnly ? static::$keyField : '*') . ' FROM ' . Db::name(static::getTableName()) . ' WHERE ' . $whereSql . ' LIMIT 1');
+        $result = static::getDb()->sql('SELECT ' . ($returnKeyOnly ? static::$keyField : '*') . ' FROM ' . Db::name(static::getTableName()) . ' WHERE ' . $whereSql . ' LIMIT 1');
         if ($returnKeyOnly) {
             return $result ? $result[static::$keyField] : false;
         }
@@ -211,7 +211,7 @@ abstract class ActiveRecord
             return;
         }
         $result = static::readData($this->key);
-        static::fromArray($result);
+        $this->importData($result);
         return $this;
     }
 
@@ -238,7 +238,7 @@ abstract class ActiveRecord
      */
     public static function readData($key)
     {
-        return Db::get(static::$dbConfigSection)->sql('SELECT * FROM ' . Db::name(static::getTableName()) . ' WHERE ' . Db::name(static::$keyField) . ' = ' . Db::get(static::$dbConfigSection)->prepare($key));
+        return static::getDb()->sql('SELECT * FROM ' . Db::name(static::getTableName()) . ' WHERE ' . Db::name(static::$keyField) . ' = ' . static::getDb()->prepare($key));
     }
 
     /**
@@ -274,18 +274,18 @@ abstract class ActiveRecord
             $this->key = $data[static::$keyField];
             unset($data[static::$keyField]);
         }
-        $setSql = Db::name(static::$keyField) . ' = ' . Db::get(static::$dbConfigSection)->prepare($this->key);
+        $setSql = Db::name(static::$keyField) . ' = ' . static::getDb()->prepare($this->key);
         if ($data) {
             foreach ($data as $name => $value) {
-                $setSql .= ',' . Db::name($name) . '=' . Db::get(static::$dbConfigSection)->prepare($value);
+                $setSql .= ',' . Db::name($name) . '=' . static::getDb()->prepare($value);
             }
         }
         if (static::$fieldCreated) {
             $setSql .= ', created=NOW()';
         }
-        Db::get(static::$dbConfigSection)->sql('INSERT INTO ' . Db::name(static::getTableName()) . ' SET ' . $setSql);
+        static::getDb()->sql('INSERT INTO ' . Db::name(static::getTableName()) . ' SET ' . $setSql);
         if (! isset($this->key)) {
-            $this->key = Db::get(static::$dbConfigSection)->getInsertId();
+            $this->key = static::getDb()->getInsertId();
         }
         $this->insertLog($setSql);
     }
@@ -299,9 +299,9 @@ abstract class ActiveRecord
      */
     public function insertLog($setSql)
     {
-        if (static::$log && Db::get(static::$dbConfigSection)->getAffectedRows()) {
+        if (static::$log && static::getDb()->getAffectedRows()) {
             $db = Db::get(Log::$dbConfigSection);
-            $db->sql('INSERT log SET initiator=' . Db::get(static::$dbConfigSection)->prepare(Initiator::createInitiatorKey()) . ',
+            $db->sql('INSERT log SET initiator=' . static::getDb()->prepare(Initiator::createInitiatorKey()) . ',
 class=' . $db->prepare(get_called_class()) . ',
 model=' . $db->prepare($this->key) . ',
 data=' . $db->prepare($setSql));
@@ -345,9 +345,9 @@ data=' . $db->prepare($setSql));
         if ($this->assignedData) {
             $setSql = '';
             foreach ($this->assignedData as $name => $value) {
-                $setSql .= ($setSql ? ',' : '') . Db::name($name) . '=' . Db::get(static::$dbConfigSection)->prepare($value);
+                $setSql .= ($setSql ? ',' : '') . Db::name($name) . '=' . static::getDb()->prepare($value);
             }
-            Db::get(static::$dbConfigSection)->sql('UPDATE ' . Db::name(static::getTableName()) . ' SET ' . $setSql . ' WHERE ' . Db::name(static::$keyField) . ' = ' . Db::get(static::$dbConfigSection)->prepare($this->key));
+            static::getDb()->sql('UPDATE ' . Db::name(static::getTableName()) . ' SET ' . $setSql . ' WHERE ' . Db::name(static::$keyField) . ' = ' . static::getDb()->prepare($this->key));
             $this->insertLog($setSql);
         }
     }
@@ -544,5 +544,16 @@ data=' . $db->prepare($setSql));
         }
         $filter = (array) $filter;
         return array_intersect_key($this->data, array_flip($filter));
+    }
+
+    /**
+     * Возвращает соединение к БД
+     *
+     * @author oleg
+     * @return Db
+     */
+    public static function getDb()
+    {
+        return Db::get(static::$dbConfigSection);
     }
 }

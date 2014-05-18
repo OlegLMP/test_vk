@@ -10,7 +10,7 @@
 <div class="executor-right-panel">
     <div class="executor-orders-container">
         <div class="executor-order-title">Ваши заказы</div>
-        Вы выполнили <span class="executor-order-count"><?php echo $params['ordersExecuted']; ?></span> заказов
+        Вы выполнили <span class="executor-order-count"><?php echo $params['ordersExecuted']; ?></span> заказ<span class="executor-order-count-suffix"><?php echo F::formatOrderNumberSuffix($params['ordersExecuted']); ?></span>
     </div>
 </div>
 <div class="clear"></div>

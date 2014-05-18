@@ -237,6 +237,10 @@ div.balance-container {
 }
 .bottom-links {
     text-align: right;
+    margin-bottom: 10px;
+}
+.bottom-links a {
+    margin: 0 10px;
 }
 .table-orders-container {
     width: 600px;
@@ -321,4 +325,71 @@ div.balance-container {
 .message-close-button-container {
 	margin-top: 150px;
 	text-align: center;
+}
+.bookkeeping-table {
+    border-collapse: collapse; 
+    border-spacing: 0px;
+    margin: 20px 0;
+}
+.bookkeeping-table td {
+    border: 1px solid;
+    width: 115px;
+    text-align: center;
+}
+.bookkeeping-table td.th1 {
+    background-color: rgb(149, 179, 215);
+    font-weight: bold;
+}
+.bookkeeping-table td.th2 {
+    background-color: rgb(196, 215, 155);
+    font-weight: bold;
+}
+.bookkeeping-table td.th3 {
+    background-color: rgb(216, 228, 188);
+    font-weight: bold;
+}
+.bookkeeping-table td.th4 {
+    background-color: rgb(218, 150, 148);
+    font-weight: bold;
+}
+.bookkeeping-table td.th5 {
+    background-color: rgb(230, 184, 183);
+    font-weight: bold;
+}
+.bookkeeping-table td.td2 {
+    background-color: rgb(235, 241, 222);
+}
+.bookkeeping-table td.td3 {
+    background-color: rgb(216, 228, 188);
+    font-weight: bold;
+}
+.bookkeeping-table td.td4 {
+    background-color: rgb(242, 220, 219);
+}
+.bookkeeping-table td.td5 {
+    background-color: rgb(230, 184, 183);
+    font-weight: bold;
+}
+.bookkeeping-table tr.s14 td {
+    font-size: 16px;
+}
+.bookkeeping-table tr.s12 td, .bookkeeping-table td.s12 {
+    font-size: 13px;
+}
+.report-row {
+	font-size: 12px;
+}
+.report-row.ok:after {
+    content: url(/img/ico/fieldcheck/apply.png);
+    margin: 0 5px;
+}
+.report-row.error:after {
+    content: url(/img/ico/fieldcheck/button_cancel.png);
+    margin: 0 5px;
+}
+.report-row-val {
+	font-weight: bold;
+}
+span.penny {
+    font-size: 70%;
 }

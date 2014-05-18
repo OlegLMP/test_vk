@@ -41,7 +41,7 @@ class CustomerController extends ControllerBase
      */
     private function _getParams()
     {
-        $db = Db::get(Order::$dbConfigSection);
+        $db = Order::getDb();
         $ordersInWork = $db->sql('SELECT count(*) FROM ' . Db::name('order') . '
 WHERE customer=' . $db->prepare($this->getLoginedUser()->key) . '
 &&status=' . OrderStatus::ID_NEW . '
