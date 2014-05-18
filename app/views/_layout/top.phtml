@@ -16,14 +16,14 @@
 </a>
 <div class="auth-links">
     <?php if ($params['loginedUser']): ?>
-    Здравствуйте,
+    Здравствуйте, <?php echo $params['loginedUser']->data['role'] == UserRole::ID_CUSTOMER ? 'заказчик': 'исполнитель'; ?>
     <b><a href="<?php echo $params['loginedUser']->data['role'] == UserRole::ID_CUSTOMER ? '/customer' : '/executor'; ?>">
         <?php echo F::escape($params['loginedUser']->data['first_name']); ?> <?php echo F::escape($params['loginedUser']->data['last_name']) ?>
     </a></b>
     <a href="/auth/logout?hash=<?php echo urlencode(ControllerBase::generateFormHash('logout')); ?>">Выйти</a>
     <?php else: ?>
     <a href="#dialog" name="modal" url="/auth/login">Вход</a>
-    <a href="#dialog" name="modal" url="/auth/register">Регистрация</a>
+    <a href="#dialog" name="modal" url="/auth/register">Регистрация заказчика</a>
     <?php endif; ?>
 </div>
 <div class="clear"></div>

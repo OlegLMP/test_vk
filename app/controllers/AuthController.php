@@ -22,7 +22,7 @@ class AuthController extends ControllerBase
     public function registerAction()
     {
         $this->_saveInSession('role', UserRole::ID_CUSTOMER);
-        $this->renderView();
+        $this->renderView(array('registrationType' => 'заказчика'));
     }
 
     /**
@@ -34,7 +34,7 @@ class AuthController extends ControllerBase
     public function regexecutorAction()
     {
         $this->_saveInSession('role', UserRole::ID_EXECUTOR);
-        $this->renderView(null, '/auth/register');
+        $this->renderView(array('registrationType' => 'исполнителя'), '/auth/register');
     }
 
     /**
