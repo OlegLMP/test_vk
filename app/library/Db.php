@@ -90,14 +90,20 @@ class Db {
      * @author oleg
      * @param string $query - SQL-запрос
      * @param int $fetchStyle - PDO::FETCH_ASSOC | PDO::FETCH_COLUMN
+     * @param bool $returnFirstRow - при true возвращается только первая строка
+     *      при false - массив из строк
+     *      Если не задано, то устанавливается в true, если SQL-запрос заканчивается на LIMIT 1, иначе устанавлиается в false
      * @return
      *     array - ассоциативный массив выбранных данных для запросов SELECT.
      *     Либо int - кол-во затронутых строк для остальных запросов: INSERT/UPDATE/DELETE и т.д.
      */
-    public function sql($query, $fetchStyle = PDO::FETCH_ASSOC)
+    public function sql($query, $fetchStyle = PDO::FETCH_ASSOC, $returnFirstRow = null)
     {
         if (! isset($fetchStyle)) {
             $fetchStyle = PDO::FETCH_ASSOC;
+        }
+        if (! isset($returnFirstRow)) {
+            $returnFirstRow = (bool) preg_match('~LIMIT 1$~iu', $query);
         }
         $pdo = $this->connect();
         if ($debug = Config::get('settings.debug')) {
@@ -111,7 +117,7 @@ class Db {
             }
             if (! strncasecmp($query, 'SELECT', 6) || ! strncasecmp($query, 'SHOW', 4)) {
                 $result = $this->_statement->fetchAll($fetchStyle);
-                if (preg_match('~LIMIT 1$~iu', $query)) {
+                if ($returnFirstRow) {
                     return array_shift($result);
                 } else {
                     return $result;

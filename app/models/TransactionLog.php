@@ -9,4 +9,10 @@ class TransactionLog extends ActiveRecord
      */
     public static $dbConfigSection = 'database3';
 
+    /**
+     * Нужно ли логировать изменение данных модели
+     *
+     * @var bool
+     */
+    public static $log = false;
 }

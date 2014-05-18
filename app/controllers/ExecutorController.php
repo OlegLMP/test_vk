@@ -79,13 +79,13 @@ LIMIT 1', PDO::FETCH_COLUMN);
 WHERE status=' . OrderStatus::ID_NEW . '
 && ' . Db::name($sortBy) . ' = ' . $db->prepare($lastData) . '
 && id' . ($sortDirection == 'ASC' ? '>' : '<') . $db->prepare($lastId) . '
-ORDER BY id ' . $sortDirection . ' LIMIT ' . self::ORDERS_SHOW_LIMIT);
+ORDER BY id ' . $sortDirection . ' LIMIT ' . self::ORDERS_SHOW_LIMIT, PDO::FETCH_ASSOC, false);
         }
         if (count($orders) < self::ORDERS_SHOW_LIMIT) {
             $orders = array_merge($orders, $db->sql('SELECT id, created, executor_fee FROM ' . Db::name(Order::getTableName()) . '
 WHERE status=' . OrderStatus::ID_NEW . '
 ' . (isset($lastData) ? '&& ' . Db::name($sortBy) . ($sortDirection == 'ASC' ? '>' : '<') . $db->prepare($lastData) : '') . '
-ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection . ' LIMIT ' . (self::ORDERS_SHOW_LIMIT - count($orders))));
+ORDER BY ' . Db::name($sortBy) . ' ' . $sortDirection . ', id ' . $sortDirection . ' LIMIT ' . (self::ORDERS_SHOW_LIMIT - count($orders)), PDO::FETCH_ASSOC, false));
         }
         if (! $orders) {
             echo json_encode(array('status' => 'noRecords'));

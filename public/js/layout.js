@@ -22,8 +22,8 @@ $(document).ready(function() {
 		$('#mask').css({'width':maskWidth,'height':maskHeight});
 		
 		//transition effect		
-		$('#mask').fadeTo("fast", 0.5);
-		$('#mask').fadeIn(0);	
+		$('#mask').fadeTo(0, 0.5);
+		//$('#mask').fadeIn(0);	
 		
 	
 		//Get the window height and width
