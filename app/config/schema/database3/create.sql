@@ -65,6 +65,7 @@ CREATE TABLE `bookkeeping_account` (
   `name` VARCHAR(255) COMMENT "Название|Название бухгалтерского счета",
   `is_asset` TINYINT UNSIGNED NOT NULL COMMENT "1 - Актив, 0 - Пассив",
   `balance` DECIMAL(18,2) NOT NULL COMMENT "Баланс|Сумма на бухгалтерском счету",
+ `transactions` TEXT NOT NULL COMMENT "Id транзакций ограниченные с обоих сторон запятыми, в которых изменялась сумма на бухгалтерском счету",
  `created` TIMESTAMP NOT NULL DEFAULT "0000-00-00 00:00:00" COMMENT "Создан",
  `updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Изменён",
   PRIMARY KEY (`id`)
@@ -78,6 +79,7 @@ CREATE TABLE `bookkeeping_account_entry` (
   `class` VARCHAR(25) COMMENT "Класс модели, с которым связана проводка",
   `model` INT UNSIGNED COMMENT "Id модели, с которой связана проводка",
   `comment` TEXT COMMENT "Комментарий",
+ `transaction` INT UNSIGNED COMMENT "transaction->id Id транзакции, в которой создалась проводка",
  `created` TIMESTAMP NOT NULL DEFAULT "0000-00-00 00:00:00" COMMENT "Создан",
  `updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Изменён",
   PRIMARY KEY (`id`)

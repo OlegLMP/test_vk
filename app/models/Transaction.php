@@ -76,6 +76,9 @@ class Transaction extends ActiveRecord
 
         // Завершаем транзакцию
         $transaction->writeData('status', TransactionStatus::ID_COMPLETED);
+
+        // Убираем id транзакции из поля в бухгалтерских счетах
+        $transaction->_removeIdFromBookkeepingAccounts();
         return true;
     }
 
@@ -167,6 +170,9 @@ class Transaction extends ActiveRecord
 
         // Завершаем транзакцию
         $transaction->writeData('status', TransactionStatus::ID_COMPLETED);
+
+        // Убираем id транзакции из поля в бухгалтерских счетах
+        $transaction->_removeIdFromBookkeepingAccounts();
         return true;
     }
 
@@ -261,6 +267,9 @@ class Transaction extends ActiveRecord
 
         // Завершаем транзакцию
         $transaction->writeData('status', TransactionStatus::ID_COMPLETED);
+
+        // Убираем id транзакции из поля в бухгалтерских счетах
+        $transaction->_removeIdFromBookkeepingAccounts();
         return true;
     }
 
@@ -384,7 +393,7 @@ WHERE ' . Db::name($class::$keyField) . '=' . $db->prepare($object->key))) {
             'class'       => $class,
             'amount'      => $amount,
         ), true);
-        $model = $class::create($data);
+        $model = $class::create($data + array('transaction' => $this->key)); // Запоминаем id транзакции, чтобы можно было легко определить, создался ли объект перед падением скрипта
         TransactionLog::create(array(
             'transaction' => $this->key,
             'action'      => TransactionAction::ID_CREATED,
@@ -418,8 +427,9 @@ WHERE ' . Db::name($class::$keyField) . '=' . $db->prepare($object->key))) {
         ), true);
         $db = Db::get($class::$dbConfigSection);
         $db->sql('UPDATE ' . Db::name($class::getTableName()) . '
-SET ' . Db::name($field) . ' = ' . Db::name($field) . ' + (' . floatval($amount) . ')
-WHERE ' . Db::name($class::$keyField) . '=' . $db->prepare($key));
+SET ' . Db::name($field) . ' = ' . Db::name($field) . ' + (' . floatval($amount) . '),
+transactions = CONCAT(transactions, ",", ' . floor($this->key) . ', ",")
+WHERE ' . Db::name($class::$keyField) . '=' . $db->prepare($key)); // Атомарно добавили id транзакции, что иметь возможность определить, было ли проведено обновление перед падением скрипта
         TransactionLog::create(array(
             'transaction' => $this->key,
             'action'      => TransactionAction::ID_INCREASED,
@@ -431,7 +441,7 @@ WHERE ' . Db::name($class::$keyField) . '=' . $db->prepare($key));
     }
 
     /**
-     * Изменение поля модели без блокировки модели
+     * Изменение поля заблокированной модели
      *
      * @author oleg
      * @param string $class - класс модели
@@ -464,5 +474,18 @@ WHERE ' . Db::name($class::$keyField) . '=' . $db->prepare($key));
             'old_value'   => $oldValue,
             'new_value'   => $newValue,
         ), true);
+    }
+
+    /**
+     * Убираем id транзакции из поля в бухгалтерских счетах
+     * Мы его туда записывали, чтобы иметь возможность определить, было ли проведено обновление перед падением скрипта
+     *
+     * @author oleg
+     * @return void
+     */
+    private function _removeIdFromBookkeepingAccounts()
+    {
+        $db = BookkeepingAccount::getDb();
+        $db->sql('UPDATE ' . Db::name(BookkeepingAccount::getTableName()) . ' SET transactions = replace(transactions, ",' . floor($this->key) . ',", "")');
     }
 }
